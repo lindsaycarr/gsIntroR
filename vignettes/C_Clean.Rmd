@@ -34,6 +34,7 @@ Before we jump into the lesson, quick links and lesson goals are:
 ##Lesson Goals
 - Show and tell on using base R for data manipulation
 - Better understand data cleaning through use of `dplyr`
+- Use conditional statements to further manipulate data
 - Use `merge()` to combine data frames by a common key
 - Do some basic reshaping and summarizing data frames
 - Know what pipes are and why you might want to use them
