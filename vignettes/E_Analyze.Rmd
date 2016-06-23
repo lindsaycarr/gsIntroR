@@ -51,7 +51,7 @@ library(smwrData)
 
 #Let's choose a prefabricated dataset, MiningIron 
 data("MiningIron")
-rbind(head(MiningIron), tail(MiningIron))
+bind_rows(head(MiningIron), tail(MiningIron))
 
 #Compare iron concentration between rock types
 #There are two rock types, these serve as your two different populations 
@@ -77,8 +77,8 @@ cor.test(UraniumTDS$TDS, UraniumTDS$Uranium)
 #Can't just do cor(UraniumTDS) because UraniumTDS has non-numeric columns:
 # cor(UraniumTDS)
 library(dplyr) # use dplyr to select the numeric columns of UraniumTDS
-select(UraniumTDS, -HCO3) %>% 
-  cor()
+UraniumTDS_onlynumeric <- select(UraniumTDS, -HCO3)  
+cor(UraniumTDS_onlynumeric)
 
 #This is especially useful for data frames with many columns that could correlate
 #Create a correlation matrix for MiscGW (all columns are numeric)
@@ -101,6 +101,27 @@ summary(lm_gwq1)
 #And now a multiple linear regression
 lm_gwq2 <- lm(Magnesium ~ HCO3 + Calcium + Sodium, data=MenomineeMajorIons)
 summary(lm_gwq2)
+```
+
+We can also put a regression line on the plot:
+
+```{r abline_examp_lm}
+plot(MenomineeMajorIons$HCO3, MenomineeMajorIons$Magnesium)
+#abline accepts a linear model object as input
+#linear model is done with lm, and uses a formula as input
+abline(lm(Magnesium ~ HCO3, data=MenomineeMajorIons))
+```
+
+We can also just add a straight line defined by slope and intercept.  We do this with `abline()`. This is useful if you have a known value that you want to compare to your data. 
+
+```{r abline_examp}
+plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3)
+#horizontal line at specified y value
+abline(h=140)
+#a vertical line
+abline(v=15)
+#Line with a slope and intercept
+abline(55, 6)
 ```
 
 All of your standard modelling approaches (and then some) are available in R, including typical variable selection techniques (e.g. stepwise with AIC) and logistic regression, which is implemented with the rest of the generalized linear models in `glm()`.  Interaction terms can be specified directly in the model, but there are several ways to do so (`x*y`, `x:y`, `x^y`).  Lastly, if you are interested in more involved or newer approaches these are likely implemented in additional packages, beyond base R and `stats`, which you can find on a repository such as [CRAN](https://cran.rstudio.com), [GRAN](http://owi.usgs.gov/R/gran.html), or [Bioconductor](https://www.bioconductor.org/packages/release/BiocViews.html#___Software).
