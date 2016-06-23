@@ -144,7 +144,93 @@ bedrock_nitrate <- filter(PugetNitrate, surfgeo == "BedRock")
 head(bedrock_nitrate)
 ```
 
-But what if I wanted to select and filter?  There are three ways to do this: use intermediate steps, nested functions, or pipes.  With the intermediate steps, you essentially create a temporary data frame and use that as input to the next function.  You can also nest functions (i.e. one function inside of another).  This is handy, but can be difficult to read if too many functions are nested as the process from inside out.  The last option, pipes, are a fairly recent addition to R.  Pipes in the unix/linux world are not new and allow you to chain commands together where the output of one command is the input to the next.  This provides a more natural way to read the commands in that they are executed in the way you conceptualize it and make the interpretation of the code a bit easier.  Pipes in R look like `%>%` and are made available via the `magrittr` package, which is installed as part of `dplyr`.  Let's try all three with the same analysis: selecting out a subset of columns but for only a single species.
+Now we have seen how to filter observations and select columns within a data frame. Now I want to add a new column. In dplyr, `mutate()` allows us to add new columns. These can be vectors you are adding or based on expressions applied to existing columns. For instance, we have a column of well depths in meters, but we would like to add a column with well depths in kilometers. 
+
+```{r mutate_example}
+#Add a column with well depth in kilometers instead of meters
+PugetNitrate_newcolumn <- mutate(PugetNitrate, wellkm = wellmet/1000)
+head(PugetNitrate_newcolumn)
+```
+
+Let's take a quick detour and learn about how to apply conditional statements to our data cleaning workflows.
+
+## Using if-else statements with dplyr
+If you have done any programing in any language, then `if-else` statements are not new to you.  All they do is tell our code how to make decisions, and they come in handy when cleaning up data frames. For instance, you might want to make a new column of data based on some condition applied to an existing column. That's easy with if-else control structures. Here's the basic syntax of an if-else statement:
+
+```
+if(some condition){
+  do something
+} else {
+  do something different
+}
+```
+
+Let's first go through basic if-else structures before using them with data frame manipulation.
+
+```{r if_else_examp}
+x <- 2
+
+# logical statement inside of () needs to return ONE logical value - TRUE or FALSE. TRUE means it will enter the following {}, FALSE means it won't.
+if(x < 0){
+  print("negative")
+} 
+
+# you can also specify something to do when the logical statement is FALSE by adding `else`
+if(x < 0){
+  print("negative")
+} else {
+  print("positive")
+}
+```
+
+The key to if-else is using a logical statement that only returns a single TRUE or FALSE, not a vector of trues or falses. The if statement needs to know if it should enter the `{}` or not, and therefore needs a single answer - yes or no. Here are some useful functions that allow you to use vectors in if-else:
+
+```{r if_else_functions}
+y <- 1:7
+
+# use "any" if you want to see if at least one of the values meets a condition
+any(y > 5)
+
+# use "!any" if you don't want any of the values to meet some condition (e.g. vector can't have negatives)
+!any(y < 0) 
+
+# use "all" when every value in a vector must meet a condition
+all(y > 5)
+
+# using these in the if-else statement
+if(any(y < 0)){
+  print("some values are negative")
+} 
+```
+
+And you can you use multiple `if` statements by stringing them together with `else`
+
+```{r if_else_examp2}
+num <- 198
+
+if(num > 0) {
+  print("positive")
+} else if (num < 0) {
+  print("negative")
+} else {
+  print("zero")
+}
+```
+
+Now that you have a basic understanding of if-else structures, let's use them with `dplyr` to manipulate a data frame. To do this, we are actually going to use a new if-else structure - the function `ifelse`. This function is similar to the previous if-else structure syntax, but the function can only return one value (rather than doing a series of commands within `{}`). See `?ifelse` for more information. Basic syntax for `ifelse()`:
+
+`ifelse(condition, yesValue, noValue)`
+
+Now, add a new column to `PugetNitrate` that categorizes each Nitrate value as "high" or "low". 
+
+```{r ifelse_dplyr}
+#use mutate along with ifelse to add a new column
+PugetNitrate_categorized <- mutate(PugetNitrate, nitrate_category = ifelse(nitrate > 1, "high", "low"))
+```
+
+## Three ways to string `dplyr` commands together
+
+But what if I wanted to select and filter the same data frame? There are three ways to do this: use intermediate steps, nested functions, or pipes.  With the intermediate steps, you essentially create a temporary data frame and use that as input to the next function.  You can also nest functions (i.e. one function inside of another).  This is handy, but can be difficult to read if too many functions are nested from inside out.  The last option, pipes, are a fairly recent addition to R.  Pipes in the unix/linux world are not new and allow you to chain commands together where the output of one command is the input to the next.  This provides a more natural way to read the commands in that they are executed in the way you conceptualize it and make the interpretation of the code a bit easier.  Pipes in R look like `%>%` and are made available via the `magrittr` package, which is installed as part of `dplyr`.  Let's try all three with the same analysis: selecting out a subset of columns but for only a single species.
 
 ```{r combine_commands}
 #Intermediate data frames
@@ -160,8 +246,7 @@ dplyr_bedrock_nest <- filter(
 head(dplyr_bedrock_nest)
 
 #Pipes
-dplyr_bedrock_pipe <- 
-  PugetNitrate %>% 
+dplyr_bedrock_pipe <- PugetNitrate %>% 
   select(surfgeo, date, nitrate) %>%
   filter(surfgeo == "BedRock")
 head(dplyr_bedrock_pipe)
@@ -177,7 +262,8 @@ This exercise is going to focus on using what we just covered on `dplyr` to star
 2. Start a new section of code in this script by simply putting in a line or two of comments indicating what it is this set of code does. Our goal for this is to create a new data frame that represents a subset of the observations as well as a subset of the data. 
 3. First, we want a new data frame based on the PugetNitrate dataset from the `smwrData` package (don't forget to load your package!). Load the data by executing `data(PugetNitrate)`. You'll see that it says `<Promise>` next to your object in the Environment. That just means it has delayed evaluation until you use it (no need to worry about that). Start typing `PugetNitrate` into the console and it should then show the dataset. 
 4. Using dplyr, remove the landuse columns (l10, l20, and l40). Think `select()`. Give the new data frame a new name, so you can distinguish it from your raw data. 
-5. Lastly, we are going to get a subset of the observations. We only want wells where the surficial geology is Alluvium or Fine. Also give this data frame a different name than before.
+5. Next, we are going to get a subset of the observations. We only want wells where the surficial geology is Alluvium or Fine. Also give this data frame a different name than before.
+6. Lastly, add a new column using an `ifelse` function that tells us if the well depth is "shallow" or "deep" based on the well depth column values `wellmet`. Hint: use `summary(PugetNitrate)` to determine what threshold would determine "shallow" vs "deep" based on the data.
 
 ##Merging Data
 Joining data in `dplyr` is accomplished via the various `x_join()` commands (e.g., `inner_join`, `left_join`, `anti_join`, etc).  These are very SQL-esque so if you speak SQL (I am far from fluent!) then these will be pretty easy for you.  If not then they aren't immediately intuitive.  For our purposes, the base functions `rbind()` and `merge()` are adequate.  
@@ -261,12 +347,6 @@ Now `slice()` which accomplishes what we did with the numeric indices before. Re
 ```{r slice_example}
 #grab rows 3 through 10
 slice(TNLoads, 3:10)
-```
-
-`mutate()` allows us to add new columns based on expressions applied to existing columns
-
-```{r mutate_example}
-mutate(TNLoads, TN=exp(LOGTN)) %>% head()
 ```
 
 Lastly, one more function, `rowwise()` allows us run rowwise, operations. Let's use this to test if the percent landuse observations in `TNLoads` are reasonable (they should total to 100). Landuse columns are PRES (residential), PNON (non-urban), PCOMM (commercial), PIND (industrial).
