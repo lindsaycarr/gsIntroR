@@ -51,7 +51,7 @@ library(smwrData)
 
 #Let's choose a prefabricated dataset, MiningIron 
 data("MiningIron")
-rbind(head(MiningIron), tail(MiningIron))
+bind_rows(head(MiningIron), tail(MiningIron))
 
 #Compare iron concentration between rock types
 #There are two rock types, these serve as your two different populations 

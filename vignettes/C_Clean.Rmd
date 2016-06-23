@@ -274,38 +274,31 @@ This exercise is going to focus on using what we just covered on `dplyr` to star
 6. Lastly, add a new column using an `ifelse` function that tells us if the well depth is "shallow" or "deep" based on the well depth column values `wellmet`. Hint: use `summary(PugetNitrate)` to determine what threshold would determine "shallow" vs "deep" based on the data.
 
 ##Merging Data
-Joining data in `dplyr` is accomplished via the various `x_join()` commands (e.g., `inner_join`, `left_join`, `anti_join`, etc).  These are very SQL-esque so if you speak SQL (I am far from fluent!) then these will be pretty easy for you.  If not then they aren't immediately intuitive.  For our purposes, the base functions `rbind()` and `merge()` are adequate.  
+Joining data in `dplyr` is accomplished via the various `x_join()` commands (e.g., `inner_join`, `left_join`, `anti_join`, etc).  These are very SQL-esque so if you speak SQL (I am far from fluent!) then these will be pretty easy for you.  If not then they aren't immediately intuitive.  There are also the base functions `rbind()` and `merge()`.  
 
 We are going to talk about several different ways to do this.  First, let's add some new rows to a data frame.  This is very handy as you might have data collected and entered at one time, and then additional observations made later that need to be added.  So with `rbind()` we can stack two data frames with the same columns to store more observations.  
 
-```{r rbind_examp}
+```{r bind_rows_examp}
 #Let's first create a new small example data.frame
-rbind_df <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
+bind_rows_df <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
 #Now an example df to add
-rbind_df2 <- data.frame(a=10:12, b=c("x","y","z"), c=c(F,F,F), d=rnorm(3))
-rbind_df <- rbind(rbind_df, rbind_df2)
-rbind_df
+bind_rows_df2 <- data.frame(a=10:12, b=c("x","y","z"), c=c(F,F,F), d=rnorm(3))
+bind_rows_df <- bind_rows(bind_rows_df, bind_rows_df2)
+bind_rows_df
 ```
 
 Now something to think about.  Could you add a vector as a new row?  Why/Why not? When/When not?
 
-Let's go back to the columns now. There are simple ways to add columns of the same length with observations in the same order to a data frame, but it is very common to have to datasets that are in different orders and have differing numbers of rows.  What we want to do in that case is going to be more of a database type function and join two tables based on a common column.  A common way to do that in base R is with `merge()`.   So let's contrive another example by creating a dataset to merge to `rbind_df` that we created above.
+Let's go back to the columns now. There are simple ways to add columns of the same length with observations in the same order to a data frame, but it is very common to have to datasets that are in different orders and have differing numbers of rows.  What we want to do in that case is going to be more of a database type function and join two tables based on a common column.  A common way to do that in base R is with `merge()`, but you can also achieve this by using `x_join` functions. So let's contrive another example by creating a dataset to merge to `bind_rows_df` that we created above. We are going to use the `left_join` function from `dplyr`, which keeps all rows from the first (left) data frame. See `?left_join` for more information.
 
 ```{r merge_example}
 # Contrived data frame
-rbind_df_merge_me <- data.frame(
+bind_rows_df_merge_me <- data.frame(
   a=c(1,3,10,11,14,6,23), x=rnorm(7), 
   names=c("bob","joe","sue",NA,NA,"jeff",NA))
-# Create merge of matches
-rbind_df_merge_match <- merge(rbind_df, rbind_df_merge_me, by="a")
-rbind_df_merge_match
-# Create merge of matches and all of the first data frame
-rbind_df_merge_allx <- merge(rbind_df, rbind_df_merge_me, by="a", all.x=TRUE)
-rbind_df_merge_allx
 
-# dplyr is faster
-rbind_df_merge_allx_dplyr <- left_join(rbind_df, rbind_df_merge_me, by="a")
-all.equal(rbind_df_merge_allx_dplyr, rbind_df_merge_allx)
+bind_rows_df_merge <- left_join(bind_rows_df, bind_rows_df_merge_me, by="a")
+bind_rows_df_merge
 ```
 
 ```{r Exercise2, echo=FALSE}
