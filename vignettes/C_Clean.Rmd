@@ -250,7 +250,15 @@ dplyr_bedrock_pipe <- PugetNitrate %>%
   select(surfgeo, date, nitrate) %>%
   filter(surfgeo == "BedRock")
 head(dplyr_bedrock_pipe)
+
+# Every function, including head(), can be chained
+PugetNitrate %>% 
+  select(surfgeo, date, nitrate) %>%
+  filter(surfgeo == "BedRock") %>% 
+  head()
 ```
+
+Although we show you the nested and piping methods, we will only use the intermediate data frames method for the remainder of this material. 
 
 ```{r Exercise1, echo=FALSE}
 ```
@@ -314,32 +322,34 @@ In this exercise we are going to practice merging data. We will be using two dat
 ##Modify and Summarize
 Now back to `dplyr`.  One area where it really shines is in modifying and summarizing.   We will do more here than we did with base, but first let's walk through one of the examples we did previously, aggregating.  We can do this with `group_by()` and  `summarize()`.
 
-First, we'll look at an example of grouping a data frame and summarizing the data within those groups.
+First, we'll look at an example of grouping a data frame and summarizing the data within those groups. Group PugetNitrate by the surface geology - you won't notice much of change between this new data frame and the original because `group_by` is changing the class of the data frame so that `dplyr` handles it appropriately in the next function. 
 
 ```{r aggregate_examp}
-#Chained with Pipes
-PugetNitrate %>%
-  group_by(surfgeo) %>%
-  summarize(mean(nitrate),
-            mean(wellmet))
+class(PugetNitrate)
+
+# Group the data frame
+PugetNitrate_grouped <- group_by(PugetNitrate, surfgeo)
+class(PugetNitrate_grouped)
+
+# Now we can summarize the data frame by the groups established previously
+PugetNitrate_summary <- summarize(PugetNitrate_grouped, mean(nitrate), mean(wellmet))
+PugetNitrate_summary
 ```
 
-There are many other functions in `dplyr` that are useful.  Much of what they do, can certainly be accomplished with base R, but not quite as intuitively.  Let's run through some examples with `arrange()`, `slice()`,  and `mutate()`.
+There are many other functions in `dplyr` that are useful.  Much of what they do, can certainly be accomplished with base R, but not quite as intuitively.  Let's run through some examples with `arrange()` and `slice()`.
 
 First `arrange()` will re-order a data frame based on the values in a specified column.  It will take multiple columns and can be in descending or ascending order. Let's try a different `smwrData` data frame this time:  `TNLoads`.  
 
 ```{r arrange_example}
 data("TNLoads")
-
 head(TNLoads)
-# every function, including head(), can be chained
-TNLoads %>% head()
+
 #ascending order is default
-arrange(TNLoads, LOGTN) %>% head()
+head(arrange(TNLoads, LOGTN))
 #descending
-arrange(TNLoads, desc(LOGTN)) %>% head()
+head(arrange(TNLoads, desc(LOGTN)))
 #multiple columns: most nitrogen with lowest rainfall at top
-arrange(TNLoads, desc(LOGTN), MSRAIN) %>% head()
+head(arrange(TNLoads, desc(LOGTN), MSRAIN))
 ```
 
 Now `slice()` which accomplishes what we did with the numeric indices before. Remembering back to that, we could grab rows of the data frame with something like `x[3:10,]`.  
@@ -349,13 +359,16 @@ Now `slice()` which accomplishes what we did with the numeric indices before. Re
 slice(TNLoads, 3:10)
 ```
 
-Lastly, one more function, `rowwise()` allows us run rowwise, operations. Let's use this to test if the percent landuse observations in `TNLoads` are reasonable (they should total to 100). Landuse columns are PRES (residential), PNON (non-urban), PCOMM (commercial), PIND (industrial).
+Lastly, one more function, `rowwise()` allows us run rowwise, operations. `rowwise()`, like `group_by` will only change the class of the data frame in preparation for the next `dplyr` function. Let's use this to test if the percent landuse observations in `TNLoads` are reasonable (they should total to 100). Landuse columns are PRES (residential), PNON (non-urban), PCOMM (commercial), PIND (industrial).
 
 ```{r rowwise_examp}
+class(TNLoads)
+
+TNLoads_byrow <- rowwise(TNLoads)
+class(TNLoads_byrow)
+
 #Add a column that totals landuse for each observation
-landuse_sum <- TNLoads %>% 
-  rowwise() %>% 
-  mutate(landuse_total = sum(PRES, PNON, PCOMM, PIND))
+landuse_sum <- mutate(TNLoads_byrow, landuse_total = sum(PRES, PNON, PCOMM, PIND))
 head(landuse_sum)
 ```
 

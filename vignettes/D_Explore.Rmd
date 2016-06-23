@@ -108,8 +108,7 @@ Not sure if this will apply to everyone, but I use scatterplots ALL the time.  S
 
 ```{r pairs_examp}
 #get a data frame with concentrations of 4 major ions and the season
-menominee_pairs <- MenomineeMajorIons %>% 
-  select(HCO3, Nitrate, Potassium, Sulfate, season)
+menominee_pairs <- select(MenomineeMajorIons, HCO3, Nitrate, Potassium, Sulfate, season)
 plot(menominee_pairs, main="Menominee Major Ions Pairs Plot")
 ```
 
