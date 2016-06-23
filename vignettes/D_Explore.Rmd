@@ -112,30 +112,7 @@ menominee_pairs <- select(MenomineeMajorIons, HCO3, Nitrate, Potassium, Sulfate,
 plot(menominee_pairs, main="Menominee Major Ions Pairs Plot")
 ```
 
-Last thing I will show with plot is how to add a line.  The one I use most often for exploratory analysis is a straight line defined by slope and intercept.  We do this with `abline()`.
-
-We can add a horizontal line and vertical line easily with this as follows:
-
-```{r abline_examp}
-plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3)
-#horizontal line at specified y value
-abline(h=140)
-#a vertical line
-abline(v=15)
-#Line with a slope and intercept
-abline(55, 6)
-```
-
-This is useful if you have a known value that you want to compare to your data.  Next example is putting a regression line on the plot.  We haven't talked about regression in R yet, but this example is simple enough I think we can get away with introducing it.
-
-```{r abline_examp_lm}
-plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3)
-#abline accepts a linear model object as input
-#linear model is done with lm, and uses a formula as input
-abline(lm(HCO3 ~ Sulfate, data=MenomineeMajorIons))
-```
-
-So, we detoured a bit.  Let's get back to a few more examples of exploratory plots.  We will look at boxplots, histograms, and cumulative distribution functions then call it quits on the exploratory analyis (and the first day, whew!)
+Let's look at boxplots, histograms, and cumulative distribution functions then call it quits on the exploratory analyis (and the first day, whew!)
 
 Two great ways to use boxplots are straight up and then by groups in a factor. For this we will use `boxplot()` and in this case it is looking for a vector as input. Sticking with `MenomineeMajorIons`:
 
