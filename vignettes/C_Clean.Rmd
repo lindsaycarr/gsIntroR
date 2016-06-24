@@ -26,9 +26,9 @@ Before we jump into the lesson, quick links and lesson goals are:
 
 
 ##Quick Links to Exercises and R code
-- [Exercise 1](#exercise-1): Subsetting the Gages data with `dplyr`
-- [Exercise 2](#exercise-2): Merge two Gages data files together.
-- [Exercise 3](#exercise-3): Using `dplyr` to modify and summarize the Gages.
+- [Exercise 1](#exercise-1): Subsetting data with `dplyr`
+- [Exercise 2](#exercise-2): Merge two data frames together.
+- [Exercise 3](#exercise-3): Using `dplyr` to modify and summarize data.
 
 
 ##Lesson Goals
