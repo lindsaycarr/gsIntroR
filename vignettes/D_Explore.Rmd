@@ -147,7 +147,7 @@ plot(calcium_ecdf)
 ##Exercise 2
 Similar to before let's first just play around with some basic exploratory data visualization using the `TNLoads` dataset from `smwrData` for the first two steps.
 
-1. Make a scatter plot relating total nitrogen to drainage area. Try adding a regression line (hint: `lm`). 
+1. Make a scatter plot relating total nitrogen to drainage area. 
 
 2. Create an impervious surface area histogram using the non-logged values. Explore different values for the argument `breaks`. 
 
