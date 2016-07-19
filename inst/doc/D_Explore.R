@@ -40,24 +40,8 @@ plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3,
 
 ## ----pairs_examp---------------------------------------------------------
 #get a data frame with concentrations of 4 major ions and the season
-menominee_pairs <- MenomineeMajorIons %>% 
-  select(HCO3, Nitrate, Potassium, Sulfate, season)
+menominee_pairs <- select(MenomineeMajorIons, HCO3, Nitrate, Potassium, Sulfate, season)
 plot(menominee_pairs, main="Menominee Major Ions Pairs Plot")
-
-## ----abline_examp--------------------------------------------------------
-plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3)
-#horizontal line at specified y value
-abline(h=140)
-#a vertical line
-abline(v=15)
-#Line with a slope and intercept
-abline(55, 6)
-
-## ----abline_examp_lm-----------------------------------------------------
-plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3)
-#abline accepts a linear model object as input
-#linear model is done with lm, and uses a formula as input
-abline(lm(HCO3 ~ Sulfate, data=MenomineeMajorIons))
 
 ## ----boxplot_examp-------------------------------------------------------
 boxplot(MenomineeMajorIons$Chloride, main="Boxplot of Chloride Concentration", ylab="Concentration")

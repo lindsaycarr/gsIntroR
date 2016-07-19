@@ -20,14 +20,14 @@ gsIntroR::navigation_array(title)
 ```
 
 
-In this third lesson we are going to start working on maninpulating and cleaning up our data frames.  We are spending some time on this because, in my experience, most data analysis and statistics classes seem to assume that 95% of the time spent working with data is on the analysis and interpretation of that analysis and little time is spent getting data ready to analyze.  However, in reality, the time spent is flipped with most time spent on cleaning up data and significantly less time on the analysis. We will just be scratching the surface of the many ways you can work with data in R.  We will show the basics of subsetting, merging, modifying, and sumarizing data and our examples will all use Hadley Wickham and Romain Francois' `dplyr` package.  There are many ways to do this type of work in R, many of which are available from base R, but I heard from many (AED colleagues and Hadley himself!) focusing on one way to do this is best, so `dplyr` it is!
+In this third lesson we are going to start working on manipulating and cleaning up our data frames.  We are spending some time on this because, in my experience, most data analysis and statistics classes seem to assume that 95% of the time spent working with data is on the analysis and interpretation of that analysis and little time is spent getting data ready to analyze.  However, in reality, the time spent is flipped with most time spent on cleaning up data and significantly less time on the analysis. We will just be scratching the surface of the many ways you can work with data in R.  We will show the basics of subsetting, merging, modifying, and sumarizing data and our examples will all use Hadley Wickham and Romain Francois' `dplyr` package.  There are many ways to do this type of work in R, many of which are available from base R, but I heard from many (AED colleagues and Hadley himself!) focusing on one way to do this is best, so `dplyr` it is!
 
 Before we jump into the lesson, quick links and lesson goals are:
 
 
 ##Quick Links to Exercises and R code
-- [Exercise 1](#exercise-1): Subsetting data with `dplyr`
-- [Exercise 2](#exercise-2): Merge two data frames together.
+- [Exercise 1](#exercise-1): Subsetting data with `dplyr`.
+- [Exercise 2](#exercise-2): Merging two data frames together.
 - [Exercise 3](#exercise-3): Using `dplyr` to modify and summarize data.
 
 
@@ -135,6 +135,7 @@ I am going to repeat some of what I showed above on data frames but now with `dp
 ```{r more_data_frame_dplyr}
 #First, select some columns
 dplyr_sel <- select(PugetNitrate, date, nitrate, surfgeo)
+head(dplyr_sel)
 #That's it.  Select one or many columns
 #Now select some observations, like before
 dplyr_high_nitrate <- filter(PugetNitrate, nitrate > 10)
@@ -155,7 +156,7 @@ head(PugetNitrate_newcolumn)
 Let's take a quick detour and learn about how to apply conditional statements to our data cleaning workflows.
 
 ## Using if-else statements with dplyr
-If you have done any programing in any language, then `if-else` statements are not new to you.  All they do is tell our code how to make decisions, and they come in handy when cleaning up data frames. For instance, you might want to make a new column of data based on some condition applied to an existing column. That's easy with if-else control structures. Here's the basic syntax of an if-else statement:
+If you have done any programing in any language, then `if-else` statements are not new to you.  All they do is tell your code how to make decisions, and they come in handy when cleaning up data frames. For instance, you might want to make a new column of data based on some condition applied to an existing column. That's easy with if-else control structures. Here's the basic syntax of an if-else statement:
 
 ```
 if(some condition){
@@ -217,11 +218,27 @@ if(num > 0) {
 }
 ```
 
-Now that you have a basic understanding of if-else structures, let's use them with `dplyr` to manipulate a data frame. To do this, we are actually going to use a new if-else structure - the function `ifelse`. This function is similar to the previous if-else structure syntax, but the function can only return one value (rather than doing a series of commands within `{}`). See `?ifelse` for more information. Basic syntax for `ifelse()`:
+Now that you have a basic understanding of if-else structures, let's use them with `dplyr` to manipulate a data frame. We want to add a new column if some condition is met, or filter a column if the condition is not met. We can use the `if-else` structure along with `mutate` and `select` from `dplyr` to accomplish this. 
+
+```{r if_else_dplyr}
+# if the column "wellkm" (well depth in kilometers) does not exist, we want to add it
+if(!'wellkm' %in% names(PugetNitrate)){
+  mutate(PugetNitrate, wellkm = wellmet/1000)
+} 
+
+# if there are more than 1000 observations, we want to filter out older observations
+if(nrow(PugetNitrate) > 1000){
+  filter(PugetNitrate, date >= as.Date("1990-01-01"))
+}
+```
+
+### Optional: the `ifelse` function
+
+Let's learn a new way to apply if-else logic - the function `ifelse`. This function is similar to the previous if-else structure syntax, but the function can only return one value (rather than doing a series of commands within `{}`). See `?ifelse` for more information. Basic syntax for `ifelse()`:
 
 `ifelse(condition, yesValue, noValue)`
 
-Now, add a new column to `PugetNitrate` that categorizes each Nitrate value as "high" or "low". 
+Add a new column to `PugetNitrate` that categorizes each Nitrate value as "high" or "low". 
 
 ```{r ifelse_dplyr}
 #use mutate along with ifelse to add a new column
@@ -230,7 +247,7 @@ PugetNitrate_categorized <- mutate(PugetNitrate, nitrate_category = ifelse(nitra
 
 ## Three ways to string `dplyr` commands together
 
-But what if I wanted to select and filter the same data frame? There are three ways to do this: use intermediate steps, nested functions, or pipes.  With the intermediate steps, you essentially create a temporary data frame and use that as input to the next function.  You can also nest functions (i.e. one function inside of another).  This is handy, but can be difficult to read if too many functions are nested from inside out.  The last option, pipes, are a fairly recent addition to R.  Pipes in the unix/linux world are not new and allow you to chain commands together where the output of one command is the input to the next.  This provides a more natural way to read the commands in that they are executed in the way you conceptualize it and make the interpretation of the code a bit easier.  Pipes in R look like `%>%` and are made available via the `magrittr` package, which is installed as part of `dplyr`.  Let's try all three with the same analysis: selecting out a subset of columns but for only a single species.
+But what if I wanted to select and filter the same data frame? There are three ways to do this: use intermediate steps, nested functions, or pipes.  With the intermediate steps, you essentially create a temporary data frame and use that as input to the next function.  You can also nest functions (i.e. one function inside of another).  This is handy, but can be difficult to read if too many functions are nested from inside out.  The last option, pipes, are a fairly recent addition to R.  Pipes in the Unix/Linux world are not new and allow you to chain commands together where the output of one command is the input to the next.  This provides a more natural way to read the commands in that they are executed in the way you conceptualize it and make the interpretation of the code a bit easier.  Pipes in R look like `%>%` and are made available via the `magrittr` package, which is installed as part of `dplyr`.  Let's try all three with the same analysis: selecting out a subset of columns but for only a single species.
 
 ```{r combine_commands}
 #Intermediate data frames
@@ -268,28 +285,28 @@ This exercise is going to focus on using what we just covered on `dplyr` to star
 
 1. If it isn't already open, make sure you have the script we created, "usgs_analysis.R" opened up.
 2. Start a new section of code in this script by simply putting in a line or two of comments indicating what it is this set of code does. Our goal for this is to create a new data frame that represents a subset of the observations as well as a subset of the data. 
-3. First, we want a new data frame based on the PugetNitrate dataset from the `smwrData` package (don't forget to load your package!). Load the data by executing `data(PugetNitrate)`. You'll see that it says `<Promise>` next to your object in the Environment. That just means it has delayed evaluation until you use it (no need to worry about that). Start typing `PugetNitrate` into the console and it should then show the dataset. 
+3. First, we want a new data frame based on the PugetNitrate dataset from the `smwrData` package (don't forget to load your package!). Load the data by executing `data(PugetNitrate)`. 
 4. Using dplyr, remove the landuse columns (l10, l20, and l40). Think `select()`. Give the new data frame a new name, so you can distinguish it from your raw data. 
 5. Next, we are going to get a subset of the observations. We only want wells where the surficial geology is Alluvium or Fine. Also give this data frame a different name than before.
 6. Lastly, add a new column using an `ifelse` function that tells us if the well depth is "shallow" or "deep" based on the well depth column values `wellmet`. Hint: use `summary(PugetNitrate)` to determine what threshold would determine "shallow" vs "deep" based on the data.
 
 ##Merging Data
-Joining data in `dplyr` is accomplished via the various `x_join()` commands (e.g., `inner_join`, `left_join`, `anti_join`, etc).  These are very SQL-esque so if you speak SQL (I am far from fluent!) then these will be pretty easy for you.  If not then they aren't immediately intuitive.  There are also the base functions `rbind()` and `merge()`.  
+Joining data in `dplyr` is accomplished via the various `x_join()` commands (e.g., `inner_join`, `left_join`, `anti_join`, etc).  These are very SQL-esque so if you speak SQL then these will be pretty easy for you.  If not then they aren't immediately intuitive.  There are also the base functions `rbind()` and `merge()`, but we won't be covering these because they are redundant with the faster, more readable `dplyr` functions.  
 
 We are going to talk about several different ways to do this.  First, let's add some new rows to a data frame.  This is very handy as you might have data collected and entered at one time, and then additional observations made later that need to be added.  So with `rbind()` we can stack two data frames with the same columns to store more observations.  
 
 ```{r bind_rows_examp}
 #Let's first create a new small example data.frame
-bind_rows_df <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
+bind_rows_df1 <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
 #Now an example df to add
 bind_rows_df2 <- data.frame(a=10:12, b=c("x","y","z"), c=c(F,F,F), d=rnorm(3))
-bind_rows_df <- bind_rows(bind_rows_df, bind_rows_df2)
+bind_rows_df <- bind_rows(bind_rows_df1, bind_rows_df2)
 bind_rows_df
 ```
 
 Now something to think about.  Could you add a vector as a new row?  Why/Why not? When/When not?
 
-Let's go back to the columns now. There are simple ways to add columns of the same length with observations in the same order to a data frame, but it is very common to have to datasets that are in different orders and have differing numbers of rows.  What we want to do in that case is going to be more of a database type function and join two tables based on a common column.  A common way to do that in base R is with `merge()`, but you can also achieve this by using `x_join` functions. So let's contrive another example by creating a dataset to merge to `bind_rows_df` that we created above. We are going to use the `left_join` function from `dplyr`, which keeps all rows from the first (left) data frame. See `?left_join` for more information.
+Let's go back to the columns now. There are simple ways to add columns of the same length with observations in the same order to a data frame, but it is very common to have to datasets that are in different orders and have differing numbers of rows.  What we want to do in that case is going to be more of a database type function and join two tables based on a common column.  We can achieve this by using `x_join` functions. So let's contrive another example by creating a dataset to merge to `bind_rows_df` that we created above. We are going to use the `left_join` function from `dplyr`, which keeps all rows from the first (left) data frame. See `?left_join` for more information.
 
 ```{r merge_example}
 # Contrived data frame
@@ -313,23 +330,24 @@ In this exercise we are going to practice merging data. We will be using two dat
 4. If that goes quickly, feel free to explore other joins (`inner_join`, `full_join`, etc).
 
 ##Modify and Summarize
-Now back to `dplyr`.  One area where it really shines is in modifying and summarizing.   We will do more here than we did with base, but first let's walk through one of the examples we did previously, aggregating.  We can do this with `group_by()` and  `summarize()`.
+One area where `dplyr` really shines is in modifying and summarizing. First, we'll look at an example of grouping a data frame and summarizing the data within those groups. We do this with `group_by()` and  `summarize()`. Group PugetNitrate by the surface geology - you won't notice much of change between this new data frame and the original because `group_by` is changing the class of the data frame so that `dplyr` handles it appropriately in the next function. 
 
-First, we'll look at an example of grouping a data frame and summarizing the data within those groups. Group PugetNitrate by the surface geology - you won't notice much of change between this new data frame and the original because `group_by` is changing the class of the data frame so that `dplyr` handles it appropriately in the next function. 
-
-```{r aggregate_examp}
+```{r group_by_examp}
 class(PugetNitrate)
 
 # Group the data frame
 PugetNitrate_grouped <- group_by(PugetNitrate, surfgeo)
 class(PugetNitrate_grouped)
+```
 
-# Now we can summarize the data frame by the groups established previously
+Now we can summarize the data frame by the groups established previously.
+
+```{r summarize_examp}
 PugetNitrate_summary <- summarize(PugetNitrate_grouped, mean(nitrate), mean(wellmet))
 PugetNitrate_summary
 ```
 
-There are many other functions in `dplyr` that are useful.  Much of what they do, can certainly be accomplished with base R, but not quite as intuitively.  Let's run through some examples with `arrange()` and `slice()`.
+There are many other functions in `dplyr` that are useful. Let's run through some examples with `arrange()` and `slice()`.
 
 First `arrange()` will re-order a data frame based on the values in a specified column.  It will take multiple columns and can be in descending or ascending order. Let's try a different `smwrData` data frame this time:  `TNLoads`.  
 
@@ -352,7 +370,7 @@ Now `slice()` which accomplishes what we did with the numeric indices before. Re
 slice(TNLoads, 3:10)
 ```
 
-Lastly, one more function, `rowwise()` allows us run rowwise, operations. `rowwise()`, like `group_by` will only change the class of the data frame in preparation for the next `dplyr` function. Let's use this to test if the percent landuse observations in `TNLoads` are reasonable (they should total to 100). Landuse columns are PRES (residential), PNON (non-urban), PCOMM (commercial), PIND (industrial).
+Lastly, one more function, `rowwise()`, allows us run rowwise, operations. `rowwise()`, like `group_by` will only change the class of the data frame in preparation for the next `dplyr` function. Let's use this to test if the percent landuse observations in `TNLoads` are reasonable (they should total to 100). Landuse columns are PRES (residential), PNON (non-urban), PCOMM (commercial), PIND (industrial).
 
 ```{r rowwise_examp}
 class(TNLoads)

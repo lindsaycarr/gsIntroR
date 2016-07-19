@@ -1,5 +1,5 @@
 ---
-title: "H. Visualize: Advanced plotting with ggplot2"
+title: "H. Visualize II"
 author: Jeffrey W. Hollister
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 

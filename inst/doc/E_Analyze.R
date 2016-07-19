@@ -15,7 +15,7 @@ library(smwrData)
 
 #Let's choose a prefabricated dataset, MiningIron 
 data("MiningIron")
-rbind(head(MiningIron), tail(MiningIron))
+bind_rows(head(MiningIron), tail(MiningIron))
 
 #Compare iron concentration between rock types
 #There are two rock types, these serve as your two different populations 
@@ -36,8 +36,8 @@ cor.test(UraniumTDS$TDS, UraniumTDS$Uranium)
 #Can't just do cor(UraniumTDS) because UraniumTDS has non-numeric columns:
 # cor(UraniumTDS)
 library(dplyr) # use dplyr to select the numeric columns of UraniumTDS
-select(UraniumTDS, -HCO3) %>% 
-  cor()
+UraniumTDS_onlynumeric <- select(UraniumTDS, -HCO3)  
+cor(UraniumTDS_onlynumeric)
 
 #This is especially useful for data frames with many columns that could correlate
 #Create a correlation matrix for MiscGW (all columns are numeric)
@@ -54,6 +54,21 @@ summary(lm_gwq1)
 #And now a multiple linear regression
 lm_gwq2 <- lm(Magnesium ~ HCO3 + Calcium + Sodium, data=MenomineeMajorIons)
 summary(lm_gwq2)
+
+## ----abline_examp_lm-----------------------------------------------------
+plot(MenomineeMajorIons$HCO3, MenomineeMajorIons$Magnesium)
+#abline accepts a linear model object as input
+#linear model is done with lm, and uses a formula as input
+abline(lm(Magnesium ~ HCO3, data=MenomineeMajorIons))
+
+## ----abline_examp--------------------------------------------------------
+plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3)
+#horizontal line at specified y value
+abline(h=140)
+#a vertical line
+abline(v=15)
+#Line with a slope and intercept
+abline(55, 6)
 
 ## ----Exercise1, echo=FALSE-----------------------------------------------
 
