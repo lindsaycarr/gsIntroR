@@ -12,25 +12,23 @@ data("MenomineeMajorIons")
 #plot Magnesium vs Calcium (winter and summer different colors)
 #Create two data frames using dplyr (winter & summer)
 library(dplyr)
-winter <- MenomineeMajorIons %>% 
-  filter(season == "winter") %>% 
-  select(Magnesium, Calcium)
-summer <- MenomineeMajorIons %>% 
-  filter(season == "summer") %>% 
-  select(Magnesium, Calcium)
+MenomineeMajorIons_winter <- filter(MenomineeMajorIons, season == "winter")
+MenomineeMajorIons_winter_MgCa <- select(MenomineeMajorIons_winter, Magnesium, Calcium)
+MenomineeMajorIons_summer <-filter(MenomineeMajorIons, season == "summer") 
+MenomineeMajorIons_summer_MgCa <- select(MenomineeMajorIons_summer, Magnesium, Calcium)
 
 #Now, plot winter and summer points in different colors
-plot(summer$Calcium, summer$Magnesium, pch=16, col='#FF5034')
-points(winter$Calcium, winter$Magnesium, pch=16, col='skyblue')
+plot(MenomineeMajorIons_summer_MgCa$Calcium, MenomineeMajorIons_summer_MgCa$Magnesium, pch=16, col='#FF5034')
+points(MenomineeMajorIons_winter_MgCa$Calcium, MenomineeMajorIons_winter_MgCa$Magnesium, pch=16, col='skyblue')
 
 ## ----par_example---------------------------------------------------------
 par(las=2, tck=0.01, bg="darkseagreen")
-plot(summer$Calcium, summer$Magnesium, pch=6)
+plot(MenomineeMajorIons_summer_MgCa$Calcium, MenomineeMajorIons_summer_MgCa$Magnesium, pch=6)
 
 ## ----legend_example------------------------------------------------------
 #use the same plot and add a legend to illustrate color and point type
-plot(summer$Calcium, summer$Magnesium, pch=16, col='#FF5034')
-points(winter$Calcium, winter$Magnesium, pch=16, col='skyblue')
+plot(MenomineeMajorIons_summer_MgCa$Calcium, MenomineeMajorIons_summer_MgCa$Magnesium, pch=16, col='#FF5034')
+points(MenomineeMajorIons_winter_MgCa$Calcium, MenomineeMajorIons_winter_MgCa$Magnesium, pch=16, col='skyblue')
 
 #add a legend
 legend(x="topright", legend=c("Summer", "Winter"),

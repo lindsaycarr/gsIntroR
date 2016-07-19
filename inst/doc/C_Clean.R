@@ -62,6 +62,7 @@ head(bedrock_nitrate)
 ## ----more_data_frame_dplyr-----------------------------------------------
 #First, select some columns
 dplyr_sel <- select(PugetNitrate, date, nitrate, surfgeo)
+head(dplyr_sel)
 #That's it.  Select one or many columns
 #Now select some observations, like before
 dplyr_high_nitrate <- filter(PugetNitrate, nitrate > 10)
@@ -69,6 +70,69 @@ head(dplyr_high_nitrate)
 #Or maybe we want just the bedrock samples
 bedrock_nitrate <- filter(PugetNitrate, surfgeo == "BedRock")
 head(bedrock_nitrate)
+
+## ----mutate_example------------------------------------------------------
+#Add a column with well depth in kilometers instead of meters
+PugetNitrate_newcolumn <- mutate(PugetNitrate, wellkm = wellmet/1000)
+head(PugetNitrate_newcolumn)
+
+## ----if_else_examp-------------------------------------------------------
+x <- 2
+
+# logical statement inside of () needs to return ONE logical value - TRUE or FALSE. TRUE means it will enter the following {}, FALSE means it won't.
+if(x < 0){
+  print("negative")
+} 
+
+# you can also specify something to do when the logical statement is FALSE by adding `else`
+if(x < 0){
+  print("negative")
+} else {
+  print("positive")
+}
+
+## ----if_else_functions---------------------------------------------------
+y <- 1:7
+
+# use "any" if you want to see if at least one of the values meets a condition
+any(y > 5)
+
+# use "!any" if you don't want any of the values to meet some condition (e.g. vector can't have negatives)
+!any(y < 0) 
+
+# use "all" when every value in a vector must meet a condition
+all(y > 5)
+
+# using these in the if-else statement
+if(any(y < 0)){
+  print("some values are negative")
+} 
+
+## ----if_else_examp2------------------------------------------------------
+num <- 198
+
+if(num > 0) {
+  print("positive")
+} else if (num < 0) {
+  print("negative")
+} else {
+  print("zero")
+}
+
+## ----if_else_dplyr-------------------------------------------------------
+# if the column "wellkm" (well depth in kilometers) does not exist, we want to add it
+if(!'wellkm' %in% names(PugetNitrate)){
+  mutate(PugetNitrate, wellkm = wellmet/1000)
+} 
+
+# if there are more than 1000 observations, we want to filter out older observations
+if(nrow(PugetNitrate) > 1000){
+  filter(PugetNitrate, date >= as.Date("1990-01-01"))
+}
+
+## ----ifelse_dplyr--------------------------------------------------------
+#use mutate along with ifelse to add a new column
+PugetNitrate_categorized <- mutate(PugetNitrate, nitrate_category = ifelse(nitrate > 1, "high", "low"))
 
 ## ----combine_commands----------------------------------------------------
 #Intermediate data frames
@@ -84,72 +148,72 @@ dplyr_bedrock_nest <- filter(
 head(dplyr_bedrock_nest)
 
 #Pipes
-dplyr_bedrock_pipe <- 
-  PugetNitrate %>% 
+dplyr_bedrock_pipe <- PugetNitrate %>% 
   select(surfgeo, date, nitrate) %>%
   filter(surfgeo == "BedRock")
 head(dplyr_bedrock_pipe)
 
+# Every function, including head(), can be chained
+PugetNitrate %>% 
+  select(surfgeo, date, nitrate) %>%
+  filter(surfgeo == "BedRock") %>% 
+  head()
+
 ## ----Exercise1, echo=FALSE-----------------------------------------------
 
-## ----rbind_examp---------------------------------------------------------
+## ----bind_rows_examp-----------------------------------------------------
 #Let's first create a new small example data.frame
-rbind_df <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
+bind_rows_df1 <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
 #Now an example df to add
-rbind_df2 <- data.frame(a=10:12, b=c("x","y","z"), c=c(F,F,F), d=rnorm(3))
-rbind_df <- rbind(rbind_df, rbind_df2)
-rbind_df
+bind_rows_df2 <- data.frame(a=10:12, b=c("x","y","z"), c=c(F,F,F), d=rnorm(3))
+bind_rows_df <- bind_rows(bind_rows_df1, bind_rows_df2)
+bind_rows_df
 
 ## ----merge_example-------------------------------------------------------
 # Contrived data frame
-rbind_df_merge_me <- data.frame(
+bind_rows_df_merge_me <- data.frame(
   a=c(1,3,10,11,14,6,23), x=rnorm(7), 
   names=c("bob","joe","sue",NA,NA,"jeff",NA))
-# Create merge of matches
-rbind_df_merge_match <- merge(rbind_df, rbind_df_merge_me, by="a")
-rbind_df_merge_match
-# Create merge of matches and all of the first data frame
-rbind_df_merge_allx <- merge(rbind_df, rbind_df_merge_me, by="a", all.x=TRUE)
-rbind_df_merge_allx
 
-# dplyr is faster
-rbind_df_merge_allx_dplyr <- left_join(rbind_df, rbind_df_merge_me, by="a")
-all.equal(rbind_df_merge_allx_dplyr, rbind_df_merge_allx)
+bind_rows_df_merge <- left_join(bind_rows_df, bind_rows_df_merge_me, by="a")
+bind_rows_df_merge
 
 ## ----Exercise2, echo=FALSE-----------------------------------------------
 
-## ----aggregate_examp-----------------------------------------------------
-#Chained with Pipes
-PugetNitrate %>%
-  group_by(surfgeo) %>%
-  summarize(mean(nitrate),
-            mean(wellmet))
+## ----group_by_examp------------------------------------------------------
+class(PugetNitrate)
+
+# Group the data frame
+PugetNitrate_grouped <- group_by(PugetNitrate, surfgeo)
+class(PugetNitrate_grouped)
+
+## ----summarize_examp-----------------------------------------------------
+PugetNitrate_summary <- summarize(PugetNitrate_grouped, mean(nitrate), mean(wellmet))
+PugetNitrate_summary
 
 ## ----arrange_example-----------------------------------------------------
 data("TNLoads")
-
 head(TNLoads)
-# every function, including head(), can be chained
-TNLoads %>% head()
+
 #ascending order is default
-arrange(TNLoads, LOGTN) %>% head()
+head(arrange(TNLoads, LOGTN))
 #descending
-arrange(TNLoads, desc(LOGTN)) %>% head()
+head(arrange(TNLoads, desc(LOGTN)))
 #multiple columns: most nitrogen with lowest rainfall at top
-arrange(TNLoads, desc(LOGTN), MSRAIN) %>% head()
+head(arrange(TNLoads, desc(LOGTN), MSRAIN))
 
 ## ----slice_example-------------------------------------------------------
 #grab rows 3 through 10
 slice(TNLoads, 3:10)
 
-## ----mutate_example------------------------------------------------------
-mutate(TNLoads, TN=exp(LOGTN)) %>% head()
-
 ## ----rowwise_examp-------------------------------------------------------
+class(TNLoads)
+
+TNLoads_byrow <- rowwise(TNLoads)
+class(TNLoads_byrow)
+
 #Add a column that totals landuse for each observation
-landuse_sum <- TNLoads %>% 
-  rowwise() %>% 
-  mutate(landuse_total = sum(PRES, PNON, PCOMM, PIND))
+landuse_sum <- mutate(TNLoads_byrow, landuse_total = sum(PRES, PNON, PCOMM, PIND))
 head(landuse_sum)
 
 ## ----Exercise3, echo=FALSE-----------------------------------------------
