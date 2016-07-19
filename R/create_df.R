@@ -22,7 +22,7 @@ getNWISdf <- function(pcodes, stateCd, startDate, endDate, siteType){
   return(nwis_data)
 }
 
-createTrainingDF <- function(nwis_data, filename){
+createTrainingDF <- function(nwis_data, filename = "inst/extdata/course_NWISdata.csv"){
   # Altering NWIS data for training example
   nwis_data_changed <- nwis_data %>% 
     sample_n(3000, replace=nrow(nwis_data) < 3000) %>% 
@@ -73,7 +73,6 @@ stateCd <- "WI"
 startDate <- "2011-05-01"
 endDate <- "2011-05-31"
 siteType <- "ST"
-filename <- paste0("inst/extdata/", stateCd, "_NWISdata.csv")
 
 nwis_data <- getNWISdf(pcodes, stateCd, startDate, endDate, siteType)
-createTrainingDF(nwis_data, filename)
+createTrainingDF(nwis_data)
