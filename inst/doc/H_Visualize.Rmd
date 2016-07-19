@@ -1,5 +1,5 @@
 ---
-title: "H. Visualize: Advanced plotting with ggplot2"
+title: "H. Visualize II"
 author: Jeffrey W. Hollister
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
@@ -167,8 +167,8 @@ Barplots can be done easily but often you want to plot a summary statistic (e.g.
 ```{r gg_bar_examp2}
 data("MiningIron")
 
-iron_minetype_mean <- group_by(MiningIron, MineType) %>%
-  summarize(mean_iron=mean(Iron))
+MiningIron_grouped <- group_by(MiningIron, MineType)
+iron_minetype_mean <- summarize(MiningIron_grouped, mean_iron=mean(Iron))
 ggplot(iron_minetype_mean, aes(x=MineType, y=mean_iron)) +
   geom_bar(stat="identity")
 ```
