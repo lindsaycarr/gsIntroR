@@ -1,5 +1,5 @@
 ---
-title: "A. Introduction to R: The basics"
+title: "A. Introduction"
 author: Jeffrey W. Hollister & Luke Winslow
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 

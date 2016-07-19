@@ -1,5 +1,5 @@
 ---
-title: "F. Analyze: Packages"
+title: "F. Analyze with USGS packages"
 author: Jeffrey W. Hollister & Emily Read
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
@@ -19,7 +19,7 @@ gsIntroR::navigation_array(title)
 ```
 
 
-The second section will run through a fairly quick example of using a package, `EGRET`, for some analysis. We'll be moving away from the GAGES-II sites in NM to focus on some other sites of interest. I've included this section just to show how (relatively) trivial it is to add an advanced capability to R via packages.
+The second section will run through a fairly quick example of using a package, `EGRET`, for some analysis. I've included this section just to show how (relatively) trivial it is to add an advanced capability to R via packages.
 
 ##Quick Links to Exercises and R code
 - [Exercise 1](#exercise-1): Use EGRET to explore flow history

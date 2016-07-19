@@ -74,8 +74,8 @@ ggplot(MenomineeMajorIons, aes(x=Sodium))+
 ## ----gg_bar_examp2-------------------------------------------------------
 data("MiningIron")
 
-iron_minetype_mean <- group_by(MiningIron, MineType) %>%
-  summarize(mean_iron=mean(Iron))
+MiningIron_grouped <- group_by(MiningIron, MineType)
+iron_minetype_mean <- summarize(MiningIron_grouped, mean_iron=mean(Iron))
 ggplot(iron_minetype_mean, aes(x=MineType, y=mean_iron)) +
   geom_bar(stat="identity")
 
