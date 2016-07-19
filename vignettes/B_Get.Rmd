@@ -353,39 +353,34 @@ examp_list
 If you want to learn more about lists or any other data structure, [Hadley Wickham's Advanced R section on data structures](http://adv-r.had.co.nz/Data-structures.html) is good.
 
 ##Reading data into R
-All of the examples so far have relied on entering data directly into the console or a script.  That mode is certainly useful for demonstrating data structures, but would be a nightmare if you were dealing with a real dataset.  What we generally want to do is read in data from a file or from a database that resides on your local machine or on the web.  There are a gazillion ways that this can be accomplished, right now, we are going to work with one, `read.csv()`.  If there is time later, we may talk about some others.
+All of the examples so far have relied on entering data directly into the console or a script.  That mode is certainly useful for demonstrating data structures, but would be a nightmare if you were dealing with a real dataset.  What we generally want to do is read in data from a file or from a database that resides on your local machine or on the web.  There are a gazillion ways that this can be accomplished, right now, we are going to work with one, `read.csv()`. It's worth mentioning that many people want to read data from Excel files. There are a variety of ways to pull data from Excel, but we recommend saving it as a csv and reading it in using `read.csv`. 
 
 `read.csv()` is a specialized version of `read.table()` that focuses on, big surprise here, `.csv` files.  This command assumes a header row with column names and that the delimiter is a comma.  The expected  
 no data value is `NA` and by default, strings are converted to factors (this can trip people up).
 
 Source files for `read.csv()` can either be on a local hard drive or, and this is pretty cool, on the web. If you had a local file it would be accessed like `mydf <- read.csv("C:/path/to/local/file.csv")`. If you are grabbing data from a website, just put the URL in the function like `mydf <- read.csv("http://www.mywebsitewithadataset.com/thecsvfileIwant.csv")`.  As an aside, paths and use of forward vs back slash is important. R is looking for forward slashes ("/"), or Unix-like paths.  You can use these in place of the back slash and be fine.  You can use a back slash but it needs to be a double back slash ("\\").  This is because the single backslash in an escape character that is used to indicate things like newlines or tabs. Doesn't really matter which one you use, I would just select one and be consistent.
 
-We are going to use the same dataset for the rest of this courses lesson examples (exercises will use different datasets). This dataset is from NWIS and was created using [this R code](https://github.com/USGS-R/gsIntroR/blob/master/R/create_df.R). Download the required csv from [here](). 
+We are going to use the same dataset for the rest of this course (exercises will use different datasets). This dataset is originally from NWIS and was altered using [this R code](https://github.com/USGS-R/gsIntroR/blob/master/R/create_df.R). Download the required csv from [here](). Put the file in your current working directory or include the entire filepath any palce we specify only the filename.
 
 ```{r read_csv_examp}
 # Read in the data and take a look at it
-intro_df <- read.csv("inst/extdata/course_NWISdata.csv")
+intro_df <- read.csv("course_NWISdata.csv")
 head(intro_df)
 str(intro_df)
 dim(intro_df)
 summary(intro_df)
 ```
 
-There are a variety of ways to pull data from Excel - we recommend saving it as a csv and reading it in using `read.csv`. In Excel, File >> Save As >> Save as type >> CSV (Comma delimited). 
-
-![How to save csv](figure/excel_to_csv.png)
-
 A common issue in reading in data is getting the column formats right. For example, the `dateTime` and `Flow_Inst_cd` columns in `intro_df` are factors by default (can you confirm this?). If you want it to be a character column instead, you can prevent it ever becoming a factor with the `stringsAsFactors` argument to `read.csv`, `data.frame`, and other data.frame-making functions:
 ```{r, eval=FALSE}
-str(read.csv("inst/extdata/course_NWISdata.csv"))
-str(read.csv("inst/extdata/course_NWISdata.csv", stringsAsFactors=FALSE))
+str(read.csv("course_NWISdata.csv"))
+str(read.csv("course_NWISdata.csv", stringsAsFactors=FALSE))
 ```
 
-Another common issue with reading in data frames for USGS data is that site numbers often have a leading zero that is dropped if it defaults to an integer. To prevent this, you can specify the class for each column, using NA for ones that you would like R to choose. In our dataset, we know that site numbers (column one) should be treated as character. We aren't positive about the other six, so we say `NA` in the arguments for `colClasses` to indicate we want `read.table` to choose for us. See `?read.table` for more information about how that how that works.
+Another issue with reading in USGS data is that site numbers often have a leading zero that is dropped if it defaults to an integer. To prevent this, you can specify the class for each column, using NA for ones that you would like R to choose. In our dataset, we know that site numbers (column one) should be treated as character. We aren't positive about the other six, so we say `NA` in the arguments for `colClasses` to indicate we want `read.table` to choose for us. See `?read.table` for more information about how that how that works.
 
 ```{r}
-intro_df <- read.csv("inst/extdata/course_NWISdata.csv", stringsAsFactors = FALSE, 
-                     colClasses = c("character", rep(NA, 6)))
+intro_df <- read.csv("course_NWISdata.csv", stringsAsFactors = FALSE, colClasses = c("character", rep(NA, 6)))
 str(intro_df)
 ```
 
@@ -401,7 +396,7 @@ write.csv(intro_df, file="example_data_frame.csv")
 
 ## Optional: Reading NWIS data into R
 
-The USGS has created an R package to directly link NWIS with R. It is called `dataRetrieval`. With it, you can quickly and easily get NWIS data into R. Go ahead and experiment with it.
+The USGS has created an R package to directly link NWIS with R. It is called `dataRetrieval`. With it, you can quickly and easily get NWIS data into R. The package functions are designed to handle the data types when pulling the data, so you don't need to worry about it. Go ahead and experiment with it.
 
 ```{r dataRetrievalExample, eval=FALSE}
 library(dataRetrieval)
