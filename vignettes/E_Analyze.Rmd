@@ -1,5 +1,5 @@
 ---
-title: "E. Analyze: Base"
+title: "E. Analyze"
 author: Jeffrey W. Hollister & Emily Read
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
@@ -43,7 +43,7 @@ pop_ttest <- t.test(pop1, pop2)
 pop_ttest
 ```
 
-`t.test()` can also take a formula specification as input. In R, a formula takes the form of `y ~ x`.  The tilde is used in place of the equals sign, the dependent variable is on the left, and the independent variable[s] are on the right.  For a t-test that is all we need to know.
+`t.test()` can also take a formula specification as input. For a t-test that is all we need to know. R formulas were described in the "Basic Visualization" section of Analyze
 
 ```{r ttest_formula_examp}
 #Load the data package!
@@ -124,7 +124,7 @@ abline(v=15)
 abline(55, 6)
 ```
 
-All of your standard modelling approaches (and then some) are available in R, including typical variable selection techniques (e.g. stepwise with AIC) and logistic regression, which is implemented with the rest of the generalized linear models in `glm()`.  Interaction terms can be specified directly in the model, but there are several ways to do so (`x*y`, `x:y`, `x^y`).  Lastly, if you are interested in more involved or newer approaches these are likely implemented in additional packages, beyond base R and `stats`, which you can find on a repository such as [CRAN](https://cran.rstudio.com), [GRAN](http://owi.usgs.gov/R/gran.html), or [Bioconductor](https://www.bioconductor.org/packages/release/BiocViews.html#___Software).
+All of your standard modeling approaches (and then some) are available in R, including typical variable selection techniques (e.g. stepwise with AIC) and logistic regression, which is implemented with the rest of the generalized linear models in `glm()`.  Interaction terms can be specified directly in the model, but we won't be covering them in this course..  Lastly, if you are interested in more involved or newer approaches these are likely implemented in additional packages, beyond base R and `stats`, which you can find on a repository such as [CRAN](https://cran.rstudio.com), [GRAN](http://owi.usgs.gov/R/gran.html), or [Bioconductor](https://www.bioconductor.org/packages/release/BiocViews.html#___Software). You can also check out task pages such as the [CRAN Environmetrics Task View](https://cran.r-project.org/web/views/Environmetrics.html) for more ideas.
 
 ```{r Exercise1, echo=FALSE}
 ```

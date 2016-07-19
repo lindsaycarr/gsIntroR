@@ -112,7 +112,7 @@ menominee_pairs <- select(MenomineeMajorIons, HCO3, Nitrate, Potassium, Sulfate,
 plot(menominee_pairs, main="Menominee Major Ions Pairs Plot")
 ```
 
-Let's look at boxplots, histograms, and cumulative distribution functions then call it quits on the exploratory analyis (and the first day, whew!)
+Let's look at boxplots, histograms, and cumulative distribution functions.
 
 Two great ways to use boxplots are straight up and then by groups in a factor. For this we will use `boxplot()` and in this case it is looking for a vector as input. Sticking with `MenomineeMajorIons`:
 
@@ -120,7 +120,7 @@ Two great ways to use boxplots are straight up and then by groups in a factor. F
 boxplot(MenomineeMajorIons$Chloride, main="Boxplot of Chloride Concentration", ylab="Concentration")
 ```
 
-As plots go, well, um, not great.  Let's try it with a bit more info and create a boxplot for each of the groups. Note the use of another R formula.
+As plots go, well, um, not great.  Let's try it with a bit more info and create a boxplot for each of the groups. Note the use of an R formula. In R, a formula takes the form of `y ~ x`.  The tilde is used in place of the equals sign, the dependent variable is on the left, and the independent variable[s] are on the right. In boxplots, `y` is the numeric data variable, and `x` is the grouping variable (usually a factor).
 
 ```{r boxplot_grps_examp}
 boxplot(MenomineeMajorIons$Chloride ~ MenomineeMajorIons$season, 
