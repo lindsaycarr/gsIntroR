@@ -270,6 +270,7 @@ intro_df %>%
 
 Although we show you the nested and piping methods, we will only use the intermediate data frames method for the remainder of this material. 
 
+##Cleaning up dataset 
 Before moving on to merging, let's try cleaning up our `intro_df` data.frame. First, take a quick look at the structure: `summary(intro_df)`. Notice anything strange? Hint: why are the pH values character? That shouldn't be the case; there should be numeric values in that column. If there are any entries that are not numeric values or `NA`, R will treat the entire column as character. You can coerce them to numeric (so anything that is not NA or a number will be coerced into NA), but you should investigate what values are causing the issue first. To do this, we coerce to numeric and look at what values were considered NA in the numeric column, but not in the character column.
 
 ```{r pH_wrong_intro_df}
