@@ -21,6 +21,8 @@ gsIntroR::navigation_array(title)
 
 Our next three lessons (Explore, Analyze, and Visualize) don't actually split neatly into groups.  That being said, I will try my best, but there will be overlap.  For this lesson we are going to focus on some of the first things you do when you start to explore a dataset including basic summary statistics and simple visualizations with base R.
 
+Remember to load the NWIS dataset we have been use. If it's no longer loaded, load in the cleaned up version using this filepath `inst/extdata/course_NWISdata_cleaned.csv`, and `read.csv` (remember that we named it `intro_df`, and don't forget `stringsAsFactors=FALSE`).
+
 ##Quick Links to Exercises and R code
 - [Exercise 1](#exercise-1): Exploring data with basic summary statistics
 - [Exercise 2](#exercise-2): Using base R graphics for exploratory data analysis 
@@ -32,8 +34,6 @@ Our next three lessons (Explore, Analyze, and Visualize) don't actually split ne
 
 ##Summary Statistics
 There are a number of ways to get at the basic summaries of a data frame in R.  The easiest is to use `summary()` which for data frames will return a summary of each column.  For numeric columns it gives quantiles, median, etc. and for factor a frequency of the terms.  This was briefly introduced in the "Get" lesson, but let's use it again. 
-
-Remember to load the NWIS dataset we have been use. If it's no longer loaded, load in the cleaned up version using this filepath `inst/extdata/course_NWISdata_cleaned.csv`, and `read.csv` (remember that we named it `intro_df`, and don't forget `stringsAsFactors=FALSE`).
 
 ```{r summary_data_example}
 summary(intro_df)
