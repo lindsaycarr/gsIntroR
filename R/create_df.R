@@ -1,8 +1,14 @@
 
 # create data frame to use throughout entire course
 
-getNWISdf <- function(pcodes, stateCd, startDate, endDate, siteType){
-  nwis_sites_parm1 <- whatNWISsites(stateCd=stateCd, siteType=siteType, parameterCd = pcodes[1], startDT = startDate)
+getNWISdf <- function(stateCd, startDate, endDate){
+  dischargeCd <- '00060'
+  tempCd <- '00010'
+  pHCd <- '00400'
+  doCd <- '00300'
+  pcodes <- c(dischargeCd, tempCd, pHCd, doCd)
+  
+  nwis_sites_parm1 <- whatNWISsites(stateCd=stateCd, siteType="ST", parameterCd = pcodes[1], startDT = startDate)
   
   sites_w_parms <- whatNWISdata(nwis_sites_parm1$site_no) %>% 
     select(site_no, parm_cd, begin_date, end_date) %>% 
@@ -64,15 +70,9 @@ insertRandomValues <- function(orig_col, nrows = 3000, percentChange, values){
 library(dataRetrieval)
 library(dplyr)
 
-dischargeCd <- '00060'
-tempCd <- '00010'
-pHCd <- '00400'
-doCd <- '00300'
-pcodes <- c(dischargeCd, tempCd, pHCd, doCd)
 stateCd <- "WI"
 startDate <- "2011-05-01"
 endDate <- "2011-05-31"
-siteType <- "ST"
 
-nwis_data <- getNWISdf(pcodes, stateCd, startDate, endDate, siteType)
+nwis_data <- getNWISdf(stateCd, startDate, endDate)
 createTrainingDF(nwis_data)
