@@ -308,28 +308,40 @@ Joining data in `dplyr` is accomplished via the various `x_join()` commands (e.g
 
 We are going to talk about several different ways to do this.  First, let's add some new rows to a data frame.  This is very handy as you might have data collected and entered at one time, and then additional observations made later that need to be added.  So with `rbind()` we can stack two data frames with the same columns to store more observations.  
 
+In this example, let's imagine we collected 3 new observations for water temperature and pH at the site "00000001". Notice that we did not collect anything for discharge or dissolved oxygen. What happens in the columns that don't match when the we bind the rows of these two data frames? 
+
 ```{r bind_rows_examp}
 #Let's first create a new small example data.frame
-bind_rows_df1 <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
-#Now an example df to add
-bind_rows_df2 <- data.frame(a=10:12, b=c("x","y","z"), c=c(F,F,F), d=rnorm(3))
-bind_rows_df <- bind_rows(bind_rows_df1, bind_rows_df2)
-bind_rows_df
+new_data <- data.frame(site_no=rep("00000001", 3), 
+                       dateTime=c("2016-09-01 07:45:00", "2016-09-02 07:45:00", "2016-09-03 07:45:00"), 
+                       Wtemp_Inst=c(14.0, 16.4, 16.0),
+                       pH_Inst = c(7.8, 8.5, 8.3),
+                       stringsAsFactors = FALSE)
+head(new_data)
+#Now add this to our existing df (intro_df)
+bind_rows_df <- bind_rows(intro_df, new_data)
+tail(bind_rows_df)
 ```
 
-Now something to think about.  Could you add a vector as a new row?  Why/Why not? When/When not?
+Now something to think about. Could you add a vector as a new row? Why/Why not? When/When not?
 
-Let's go back to the columns now. There are simple ways to add columns of the same length with observations in the same order to a data frame, but it is very common to have to datasets that are in different orders and have differing numbers of rows.  What we want to do in that case is going to be more of a database type function and join two tables based on a common column.  We can achieve this by using `x_join` functions. So let's contrive another example by creating a dataset to merge to `bind_rows_df` that we created above. We are going to use the `left_join` function from `dplyr`, which keeps all rows from the first (left) data frame. See `?left_join` for more information.
+Let's go back to the columns now. There are simple ways to add columns of the same length with observations in the same order to a data frame, but it is very common to have to datasets that are in different orders and have differing numbers of rows.  What we want to do in that case is going to be more of a database type function and join two tables based on a common column.  We can achieve this by using `x_join` functions. So let's imagine that we did actually collect dissolved oxygen, discharge, and chloride concentration on our observation dates. Also, we collected on some additional dates. We don't care about the additional dates, so use the `left_join` function from `dplyr`, which keeps all rows from the first (left) data frame. See `?left_join` for more information.
 
 ```{r merge_example}
-# Contrived data frame
-bind_rows_df_merge_me <- data.frame(
-  a=c(1,3,10,11,14,6,23), x=rnorm(7), 
-  names=c("bob","joe","sue",NA,NA,"jeff",NA))
+# DO and discharge data
+forgotten_data <- data.frame(site_no=rep("00000001", 5),
+                             dateTime=c("2016-09-01 07:45:00", "2016-09-02 07:45:00", "2016-09-03 07:45:00",
+                                        "2016-09-04 07:45:00", "2016-09-05 07:45:00"),
+                             DO_Inst=c(10.2,8.7,9.3,9.2,8.9),
+                             Cl_conc=c(15.6,11.0,14.2,13.6,13.7),
+                             Flow_Inst=c(25,54,67,60,59),
+                             stringsAsFactors = FALSE)
 
-bind_rows_df_merge <- left_join(bind_rows_df, bind_rows_df_merge_me, by="a")
-bind_rows_df_merge
+left_join(new_data, forgotten_data, by=c("site_no", "dateTime"))
+
 ```
+
+Notice that the `left_join` kept only the matching rows (September 1-3), but kept all columns. If we wanted to remove the chloride concentration column, we can use `select` which we learned earlier in this lesson.
 
 ```{r Exercise2, echo=FALSE}
 ```
@@ -343,57 +355,75 @@ In this exercise we are going to practice merging data. We will be using two dat
 4. If that goes quickly, feel free to explore other joins (`inner_join`, `full_join`, etc).
 
 ##Modify and Summarize
-One area where `dplyr` really shines is in modifying and summarizing. First, we'll look at an example of grouping a data frame and summarizing the data within those groups. We do this with `group_by()` and  `summarize()`. Group PugetNitrate by the surface geology - you won't notice much of change between this new data frame and the original because `group_by` is changing the class of the data frame so that `dplyr` handles it appropriately in the next function. 
+One area where `dplyr` really shines is in modifying and summarizing. First, we'll look at an example of grouping a data frame and summarizing the data within those groups. We do this with `group_by()` and  `summarize()`. You won't notice much of change between this new data frame and the original because `group_by` is changing the class of the data frame so that `dplyr` handles it appropriately in the next function. Let's look at the average discharge and water temperature by site.
+
 
 ```{r group_by_examp}
-class(PugetNitrate)
+class(intro_df)
 
 # Group the data frame
-PugetNitrate_grouped <- group_by(PugetNitrate, surfgeo)
-class(PugetNitrate_grouped)
+intro_df_grouped <- group_by(intro_df, site_no)
+class(intro_df_grouped)
 ```
 
 Now we can summarize the data frame by the groups established previously.
 
+```{r summarize_examp_NA}
+intro_df_summary <- summarize(intro_df_grouped, mean(Flow_Inst), mean(Wtemp_Inst))
+intro_df_summary
+```
+
+Notice that this summary just returns NAs. We need the mean calculations to ignore the NA values. We could remove the NAs using `filter()` and then pass that data.frame into `summarize`, or we can tell the mean function to ignore the NAs using the argument `na.rm=TRUE` in the `mean` function. See `?mean` to learn more about this argument.
+
 ```{r summarize_examp}
-PugetNitrate_summary <- summarize(PugetNitrate_grouped, mean(nitrate), mean(wellmet))
-PugetNitrate_summary
+intro_df_summary <- summarize(intro_df_grouped, mean(Flow_Inst, na.rm=TRUE), mean(Wtemp_Inst, na.rm=TRUE))
+intro_df_summary
 ```
 
 There are many other functions in `dplyr` that are useful. Let's run through some examples with `arrange()` and `slice()`.
 
-First `arrange()` will re-order a data frame based on the values in a specified column.  It will take multiple columns and can be in descending or ascending order. Let's try a different `smwrData` data frame this time:  `TNLoads`.  
+First `arrange()` will re-order a data frame based on the values in a specified column.  It will take multiple columns and can be in descending or ascending order. 
 
 ```{r arrange_example}
-data("TNLoads")
-head(TNLoads)
-
 #ascending order is default
-head(arrange(TNLoads, LOGTN))
+head(arrange(intro_df, DO_Inst))
 #descending
-head(arrange(TNLoads, desc(LOGTN)))
-#multiple columns: most nitrogen with lowest rainfall at top
-head(arrange(TNLoads, desc(LOGTN), MSRAIN))
+head(arrange(intro_df, desc(DO_Inst)))
+#multiple columns: lowest flow with highest temperature at top
+head(arrange(intro_df, Flow_Inst, desc(Wtemp_Inst)))
 ```
 
-Now `slice()` which accomplishes what we did with the numeric indices before. Remembering back to that, we could grab rows of the data frame with something like `x[3:10,]`.  
+Now `slice()`, which accomplishes what we did with the numeric indices before. Remembering back to that, we could grab rows of the data frame with something like `intro_df[3:10,]` or we can use `slice`:  
 
 ```{r slice_example}
 #grab rows 3 through 10
-slice(TNLoads, 3:10)
+slice(intro_df, 3:10)
 ```
 
-Lastly, one more function, `rowwise()`, allows us run rowwise, operations. `rowwise()`, like `group_by` will only change the class of the data frame in preparation for the next `dplyr` function. Let's use this to test if the percent landuse observations in `TNLoads` are reasonable (they should total to 100). Landuse columns are PRES (residential), PNON (non-urban), PCOMM (commercial), PIND (industrial).
+Lastly, one more function, `rowwise()`, allows us to run rowwise, operations. Let's say we had two dissolved oxygen columns, and we only wanted to keep the maximum value out of the two for each observation. This can easily be accomplished using`rowwise`. First, add a new dissolved oxygen column with random values (see `?runif`). 
+
+```{r add_do_random}
+intro_df_2DO <- mutate(intro_df, DO_2 = runif(n=nrow(intro_df), min = 5.0, max = 18.0))
+head(intro_df_2DO)
+```
+
+Now, let's use `rowwise` to find the maximum dissolved oxygen for each observation.
+
+```{r no_rowwise_examp}
+head(mutate(intro_df_2DO, max_DO = max(DO_Inst, DO_2)))
+```
+
+The max is always NA because it is treating the arguments as vectors. It would be similar to running `max(intro_df_2DO$Flow_Inst, intro_df_2DO$DO_2)`. So we need to group by row. `rowwise()`, like `group_by` will only change the class of the data frame in preparation for the next `dplyr` function. 
 
 ```{r rowwise_examp}
-class(TNLoads)
+class(intro_df_2DO)
 
-TNLoads_byrow <- rowwise(TNLoads)
-class(TNLoads_byrow)
+intro_df_2DO_byrow <- rowwise(intro_df_2DO)
+class(intro_df_2DO_byrow)
 
 #Add a column that totals landuse for each observation
-landuse_sum <- mutate(TNLoads_byrow, landuse_total = sum(PRES, PNON, PCOMM, PIND))
-head(landuse_sum)
+intro_df_DO_max <- mutate(intro_df_2DO_byrow, max_DO = max(DO_Inst, DO_2))
+head(intro_df_DO_max)
 ```
 
 We now have quite a few tools that we can use to clean and manipulate data in R.  We have barely touched what both base R and `dplyr` are capable of accomplishing, but hopefully you now have some basics to build on. 
