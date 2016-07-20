@@ -50,7 +50,7 @@ There is a lot of great info on `dplyr`.  If you have an interest, I'd encourage
 - [CRAN page: vignettes here](http://cran.rstudio.com/web/packages/dplyr/)
 
 ##Subsetting in base R
-In base R you can use a indexing to select out rows and columns.  You will see this quite often in other people's code, so I want to at least show it to you.  
+In base R you can use indexing to select out rows and columns.  You will see this quite often in other people's code, so I want to at least show it to you.  
 
 ```{r indexing_examp}
 #Create a vector
@@ -73,44 +73,40 @@ x[x %% 2 == 0]
 
 You can also index a data frame or select individual columns of a data frame.  Since a data frame has two dimensions, you need to specify an index for both the row and the column.  You can specify both and get a single value like `data_frame[row,column]`, specify just the row and the get the whole row back like `data_frame[row,]` or get just the column with `data_frame[,column]`. These examples show that. 
 
-For the remainder of this course, I will be using prefabricated datasets from the `smwrData` package. This package is a collection of real hydrologic data that can be loaded into your R workspace and used. It is similar to the stock R datasets (type `data()` into your console to see stock datasets), but with USGS-relevant data. So don't forget to load the package for each new R session (I will remind you at the beginning of each lesson).
+Remember our NWIS data we loaded in the `Get` lesson? That's the dataset we will use here. If it's no longer loaded, go back to the "Reading data into R" section and read the data into R as a data frame (remember that we named it `intro_df`).
 
 ```{r data_frame_index}
-#Let's use one a data frame from the smwrData package
 
-#Load the package and data frame:
-library(smwrData)
-data("PugetNitrate")
-
-head(PugetNitrate)
-#And grab a specific value
-PugetNitrate[1,1]
-#A whole column
-nitrate_levels <- PugetNitrate[,7]
-nitrate_levels
-#A row
-obs15<-PugetNitrate[15,]
-obs15
-#Many rows
-obs3to7<-PugetNitrate[3:7,]
-obs3to7
+#Take a look at the data frame
+head(intro_df)
+#And grab the first site_no
+intro_df[1,1]
+#Get a whole column
+intro_df[,7]
+#Get a single row
+intro_df[15,]
+#Grab multiple rows
+intro_df[3:7,]
 ```
 
-Also remember that data frames have column names.  We can use those too.  Let's try it.
+Did you notice the difference between subsetting by a row and subsetting by a column? Subsetting a column returns a vector, but subsetting a row returns a data.frame. This is because columns (like vectors) contain a single data type, but rows can contain multiple data types, so it could not become a vector.
+
+Also remember that data frames have column names. We can use those too. Let's try it.
 
 ```{r more_data_frame_index}
 #First, there are a couple of ways to use the column names
-PugetNitrate$wellid
-head(PugetNitrate["wellid"])
+head(intro_df$site_no)
+head(intro_df["site_no"])
+head(intro_df[["site_no"]])
 #Multiple colums
-head(PugetNitrate[c("date","nitrate")])
+head(intro_df[c("dateTime","Flow_Inst")])
 #Now we can combine what we have seen to do some more complex queries
-#Get all the data where nitrate concentration is greater than 10
-high_nitrate <- PugetNitrate[PugetNitrate$nitrate > 10,]
-head(high_nitrate)
-#Or maybe we want just the nitrate concentrations for Bedrock geology
-bedrock_nitrate <- PugetNitrate$nitrate[PugetNitrate$surfgeo == "BedRock"]
-head(bedrock_nitrate)
+#Get all the data where water temperature is greater than 15
+high_temp <- intro_df[intro_df$Wtemp_Inst > 15,]
+head(high_temp)
+#Or maybe we want just the discharge that was estimated (code is "E")
+estimated_q <- intro_df$Flow_Inst[intro_df$Flow_Inst_cd == "E"]
+head(estimated_q)
 ```
 
 
@@ -133,23 +129,22 @@ I am going to repeat some of what I showed above on data frames but now with `dp
 
 ```{r more_data_frame_dplyr}
 #First, select some columns
-dplyr_sel <- select(PugetNitrate, date, nitrate, surfgeo)
+dplyr_sel <- select(intro_df, site_no, dateTime, DO_Inst)
 head(dplyr_sel)
-#That's it.  Select one or many columns
 #Now select some observations, like before
-dplyr_high_nitrate <- filter(PugetNitrate, nitrate > 10)
-head(dplyr_high_nitrate)
-#Or maybe we want just the bedrock samples
-bedrock_nitrate <- filter(PugetNitrate, surfgeo == "BedRock")
-head(bedrock_nitrate)
+dplyr_high_temp <- filter(intro_df, Wtemp_Inst > 15)
+head(dplyr_high_temp)
+#Find just observations with estimated flows (as above)
+dplyr_estimated_q <- filter(intro_df, Flow_Inst_cd == "E")
+head(dplyr_estimated_q)
 ```
 
-Now we have seen how to filter observations and select columns within a data frame. Now I want to add a new column. In dplyr, `mutate()` allows us to add new columns. These can be vectors you are adding or based on expressions applied to existing columns. For instance, we have a column of well depths in meters, but we would like to add a column with well depths in kilometers. 
+Now we have seen how to filter observations and select columns within a data frame. Now I want to add a new column. In dplyr, `mutate()` allows us to add new columns. These can be vectors you are adding or based on expressions applied to existing columns. For instance, we have a column of dissolved oxygen in milligrams per liter (mg/L), but we would like to add a column with dissolved oxygen in milligrams per milliliter (mg/mL). 
 
 ```{r mutate_example}
-#Add a column with well depth in kilometers instead of meters
-PugetNitrate_newcolumn <- mutate(PugetNitrate, wellkm = wellmet/1000)
-head(PugetNitrate_newcolumn)
+#Add a column with dissolved oxygen in mg/mL instead of mg/L
+intro_df_newcolumn <- mutate(intro_df, DO_mgmL = DO_Inst/1000)
+head(intro_df_newcolumn)
 ```
 
 Let's take a quick detour and learn about how to apply conditional statements to our data cleaning workflows.
@@ -220,14 +215,14 @@ if(num > 0) {
 Now that you have a basic understanding of if-else structures, let's use them with `dplyr` to manipulate a data frame. We want to add a new column if some condition is met, or filter a column if the condition is not met. We can use the `if-else` structure along with `mutate` and `select` from `dplyr` to accomplish this. 
 
 ```{r if_else_dplyr}
-# if the column "wellkm" (well depth in kilometers) does not exist, we want to add it
-if(!'wellkm' %in% names(PugetNitrate)){
-  mutate(PugetNitrate, wellkm = wellmet/1000)
+# if the column "DO_mgmL" (dissolved oxygen in mg/mL) does not exist, we want to add it
+if(!'DO_mgmL' %in% names(intro_df)){
+  mutate(intro_df, DO_mgmL = DO_Inst/1000)
 } 
 
-# if there are more than 1000 observations, we want to filter out older observations
-if(nrow(PugetNitrate) > 1000){
-  filter(PugetNitrate, date >= as.Date("1990-01-01"))
+# if there are more than 1000 observations, we want to filter out high temperature observations
+if(nrow(intro_df) > 1000){
+  filter(intro_df, Wtemp_Inst >= 15)
 }
 ```
 
@@ -237,40 +232,39 @@ Let's learn a new way to apply if-else logic - the function `ifelse`. This funct
 
 `ifelse(condition, yesValue, noValue)`
 
-Add a new column to `PugetNitrate` that categorizes each Nitrate value as "high" or "low". 
+Add a new column to `intro_df` that removes the flow value if it is erroneous (code is "X"), otherewise, retain the flow value. 
 
 ```{r ifelse_dplyr}
 #use mutate along with ifelse to add a new column
-PugetNitrate_categorized <- mutate(PugetNitrate, nitrate_category = ifelse(nitrate > 1, "high", "low"))
+intro_df_revised <- mutate(intro_df, Flow_revised = ifelse(Flow_Inst_cd == "X", NA, Flow_Inst))
 ```
 
 ## Three ways to string `dplyr` commands together
 
-But what if I wanted to select and filter the same data frame? There are three ways to do this: use intermediate steps, nested functions, or pipes.  With the intermediate steps, you essentially create a temporary data frame and use that as input to the next function.  You can also nest functions (i.e. one function inside of another).  This is handy, but can be difficult to read if too many functions are nested from inside out.  The last option, pipes, are a fairly recent addition to R.  Pipes in the Unix/Linux world are not new and allow you to chain commands together where the output of one command is the input to the next.  This provides a more natural way to read the commands in that they are executed in the way you conceptualize it and make the interpretation of the code a bit easier.  Pipes in R look like `%>%` and are made available via the `magrittr` package, which is installed as part of `dplyr`.  Let's try all three with the same analysis: selecting out a subset of columns but for only a single species.
+But what if I wanted to select and filter the same data frame? There are three ways to do this: use intermediate steps, nested functions, or pipes.  With the intermediate steps, you essentially create a temporary data frame and use that as input to the next function.  You can also nest functions (i.e. one function inside of another).  This is handy, but can be difficult to read if too many functions are nested from inside out.  The last option, pipes, are a fairly recent addition to R.  Pipes in the Unix/Linux world are not new and allow you to chain commands together where the output of one command is the input to the next.  This provides a more natural way to read the commands in that they are executed in the way you conceptualize it and make the interpretation of the code a bit easier.  Pipes in R look like `%>%` and are made available via the `magrittr` package, which is installed as part of `dplyr`.  Let's try all three with the same analysis: selecting out a subset of columns but only for the discharge qualifier (`Flow_Inst_cd`) indicating an erroneous value, "X".
 
 ```{r combine_commands}
 #Intermediate data frames
-#Select First: note the order of the output, neat too!
-dplyr_bedrock_tmp1 <- select(PugetNitrate, surfgeo, date, nitrate)
-dplyr_bedrock_tmp <- filter(dplyr_bedrock_tmp1, surfgeo == "BedRock")
-head(dplyr_bedrock_tmp)
+dplyr_error_tmp1 <- select(intro_df, site_no, dateTime, Flow_Inst, Flow_Inst_cd)
+dplyr_error_tmp <- filter(dplyr_error_tmp1, Flow_Inst_cd == "X")
+head(dplyr_error_tmp)
 
 #Nested function
-dplyr_bedrock_nest <- filter(
-  select(PugetNitrate, surfgeo, date, nitrate),
-  surfgeo == "BedRock")
-head(dplyr_bedrock_nest)
+dplyr_error_nest <- filter(
+  select(intro_df, site_no, dateTime, Flow_Inst, Flow_Inst_cd),
+  Flow_Inst_cd == "X")
+head(dplyr_error_nest)
 
 #Pipes
-dplyr_bedrock_pipe <- PugetNitrate %>% 
-  select(surfgeo, date, nitrate) %>%
-  filter(surfgeo == "BedRock")
-head(dplyr_bedrock_pipe)
+dplyr_error_pipe <- intro_df %>% 
+  select(site_no, dateTime, Flow_Inst, Flow_Inst_cd) %>%
+  filter(Flow_Inst_cd == "X")
+head(dplyr_error_pipe)
 
 # Every function, including head(), can be chained
-PugetNitrate %>% 
-  select(surfgeo, date, nitrate) %>%
-  filter(surfgeo == "BedRock") %>% 
+intro_df %>% 
+  select(site_no, dateTime, Flow_Inst, Flow_Inst_cd) %>%
+  filter(Flow_Inst_cd == "X") %>% 
   head()
 ```
 
@@ -278,7 +272,7 @@ Although we show you the nested and piping methods, we will only use the interme
 
 Before moving on to merging, let's try cleaning up our `intro_df` data.frame. First, take a quick look at the structure: `summary(intro_df)`. Notice anything strange? Hint: why are the pH values character? That shouldn't be the case; there should be numeric values in that column. If there are any entries that are not numeric values or `NA`, R will treat the entire column as character. You can coerce them to numeric (so anything that is not NA or a number will be coerced into NA), but you should investigate what values are causing the issue first. To do this, we coerce to numeric and look at what values were considered NA in the numeric column, but not in the character column.
 
-```{r cleaning_up_intro_df}
+```{r pH_wrong_intro_df}
 pH_df <- select(intro_df, pH_Inst)
 pH_numeric_df <- mutate(pH_df, pH_Inst_numeric = as.numeric(pH_Inst))
 filter(pH_numeric_df, is.na(pH_Inst_numeric), pH_Inst != "NA")
