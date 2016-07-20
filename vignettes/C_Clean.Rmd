@@ -277,10 +277,30 @@ PugetNitrate %>%
 
 Although we show you the nested and piping methods, we will only use the intermediate data frames method for the remainder of this material. 
 
+Before moving on to merging, let's try cleaning up our `intro_df` data.frame. First, take a quick look at the structure: `summary(intro_df)`. Notice anything strange? Hint: why are the pH values character? That shouldn't be the case; there should be numeric values in that column. If there are any entries that are not numeric values or `NA`, R will treat the entire column as character. You can coerce them to numeric (so anything that is not NA or a number will be coerced into NA), but you should investigate what values are causing the issue first. To do this, we coerce to numeric and look at what values were considered NA in the numeric column, but not in the character column.
+
+```{r cleaning_up_intro_df}
+pH_df <- select(intro_df, pH_Inst)
+pH_numeric_df <- mutate(pH_df, pH_Inst_numeric = as.numeric(pH_Inst))
+filter(pH_numeric_df, is.na(pH_Inst_numeric), pH_Inst != "NA")
+```
+
+Looks like the culprits are entries of `None` and blank spaces. These are both scenarios that I would feel comfortable setting to NA, so using `as.numeric` will suffice. However, there could have been a symbol that indicated the value should be something other than missing. That's why it is important to check. Let's actually clean up that column and create a new data.frame. Then use `summary()` to verify that the columns are correct. 
+
+```{r cleaning_up_intro_df}
+intro_df <- mutate(intro_df, pH_Inst = as.numeric(pH_Inst))
+summary(intro_df)
+```
+
+You might have noticed that the date column is treated as character and not Date or POSIX. Handling dates are beyond this course, but they are available in this dataset if you would like to work with them.
+
 ```{r Exercise1, echo=FALSE}
 ```
 
 ##Exercise 1
+
+For the remainder of the exercises in this course, we will be using prefabricated datasets from the `smwrData` package. This package is a collection of real hydrologic data that can be loaded into your R workspace and used. It is similar to the stock R datasets (type `data()` into your console to see stock datasets), but with USGS-relevant data. So don't forget to load the package before the exercise.
+
 This exercise is going to focus on using what we just covered on `dplyr` to start to clean up a dataset.  Remember to use the stickies: green when you're done, red if you have a problem.
 
 1. If it isn't already open, make sure you have the script we created, "usgs_analysis.R" opened up.
