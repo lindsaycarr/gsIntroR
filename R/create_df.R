@@ -65,6 +65,12 @@ insertRandomValues <- function(orig_col, nrows = 3000, percentChange, values){
   return(new_col)
 }
 
+createDFCleanSubset <- function(intro_df, filename = "inst/extdata/course_NWISdata_cleaned.csv"){
+  # data frame after subsetting section in Clean
+  cleaned_df <- mutate(intro_df, pH_Inst = as.numeric(pH_Inst))
+  write.csv(cleaned_df, filename, row.names=FALSE)
+}
+
 # Workflow to create training df
 
 library(dataRetrieval)
@@ -75,4 +81,5 @@ startDate <- "2011-05-01"
 endDate <- "2011-05-31"
 
 nwis_data <- getNWISdf(stateCd, startDate, endDate)
-createTrainingDF(nwis_data)
+intro_df <- createTrainingDF(nwis_data)
+clean_df <- createDFCleanSubset(intro_df)
