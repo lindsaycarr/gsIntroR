@@ -7,135 +7,116 @@ gsIntroR::navigation_array(title)
 library(ggplot2)
 library(dplyr)
 
-#Load the data package!
-library(smwrData)
-
 ## ----ggplot_examp--------------------------------------------------------
 # aes() are the "aesthetics" info.  When you simply add the x and y
 # that can seem a bit of a confusing term.  You also use aes() to 
-# change clor, shape, size etc. of some items
-data("MenomineeMajorIons")
-ion_gg <- ggplot(MenomineeMajorIons, aes(x=Magnesium, y=Potassium))
-ion_gg
+# change color, shape, size etc. of some items
+qtemp_gg <- ggplot(data=intro_df, aes(x=Flow_Inst, y=Wtemp_Inst))
+qtemp_gg
 
 ## ----points_examp--------------------------------------------------------
 #Different syntax than you are used to
-ion_gg + geom_point()
+qtemp_gg + geom_point()
 
 #This too can be saved to an object
-ion_scatter <- ion_gg + geom_point()
+qtemp_scatter <- qtemp_gg + geom_point()
 
 #Call it to create the plot
-ion_scatter
+qtemp_scatter
 
 ## ----ion_labels----------------------------------------------------------
-ion_scatter <- ion_scatter +
-  labs(title="Potassium vs Magnesium Concentrations in Menominee River",
-       x="Magnesium Concentration", y="Potassium Concentration")
+qtemp_scatter <- qtemp_scatter +
+  labs(title="Water temperature vs Flow",
+       x="Discharge, cfs", y="Water temperature, deg C")
 # same thing, different commands
-ion_scatter <- ion_scatter +
-  ggtitle("Potassium vs Magnesium Concentrations in Menominee River") +
-  xlab("Magnesium Concentration") + ylab("Potassium Concentration")
-ion_scatter
+qtemp_scatter <- qtemp_scatter +
+  ggtitle("Water temperature vs Flow") +
+  xlab("Discharge, cfs") + ylab("Water temperature, deg C")
+qtemp_scatter
 
 ## ----ion_colors----------------------------------------------------------
-ion_scatter <- ion_scatter +
-  geom_point(aes(color=season, shape=season), size=5)
-ion_scatter
+qtemp_scatter <- qtemp_scatter +
+  geom_point(aes(color=Flow_Inst_cd, shape=site_no), size=2)
+qtemp_scatter
 
 ## ----ion_loess-----------------------------------------------------------
-ion_scatter_loess <- ion_scatter +
-  geom_smooth()
-ion_scatter_loess
+qtemp_scatter + geom_smooth()
 
 ## ----ion_lm--------------------------------------------------------------
-ion_scatter_lm <- ion_scatter +
-  geom_smooth(method="lm")
-ion_scatter_lm
+qtemp_scatter + geom_smooth(method="lm")
 
 ## ----ion_lm_groups-------------------------------------------------------
-ion_scatter_lm_group <- ion_scatter +
-  geom_smooth(method="lm", aes(group=season))
-ion_scatter_lm_group
+qtemp_scatter + geom_smooth(method="lm", aes(group=site_no))
 
 ## ----ion_lm_color--------------------------------------------------------
-ion_scatter_lm_color <- ion_scatter +
-  geom_smooth(method="lm", aes(color=season, fill=season))
-ion_scatter_lm_color
+qtemp_scatter + geom_smooth(method="lm", aes(color=Flow_Inst_cd, fill=Flow_Inst_cd))
 
 ## ----gg_box_examp--------------------------------------------------------
-ggplot(MenomineeMajorIons, aes(x=season, y=Sodium)) +
-  geom_boxplot()
+ggplot(data=intro_df, aes(x=site_no, y=DO_Inst)) + geom_boxplot()
 
 ## ----gg_hist_examp-------------------------------------------------------
-ggplot(MenomineeMajorIons, aes(x=Sodium))+
-  geom_histogram(binwidth=1)
+ggplot(data=intro_df, aes(x=pH_Inst))+ geom_histogram()
 
 ## ----gg_bar_examp2-------------------------------------------------------
-data("MiningIron")
-
-MiningIron_grouped <- group_by(MiningIron, MineType)
-iron_minetype_mean <- summarize(MiningIron_grouped, mean_iron=mean(Iron))
-ggplot(iron_minetype_mean, aes(x=MineType, y=mean_iron)) +
+intro_df_grouped <- group_by(intro_df, site_no)
+intro_df_flow_mean <- summarize(intro_df_grouped, mean_flow=mean(Flow_Inst, na.rm=TRUE))
+ggplot(intro_df_flow_mean, aes(x=site_no, y=mean_flow)) +
   geom_bar(stat="identity")
 
 ## ----Exercise1, echo=FALSE-----------------------------------------------
 
 ## ----themes_examp--------------------------------------------------------
-scatter_ions <- ggplot(MenomineeMajorIons, aes(x=Magnesium, y=Potassium)) +
-  geom_point(aes(color=season, shape=season))
-scatter_ions
+qtemp_scatter <- ggplot(data=intro_df, aes(x=Flow_Inst, y=Wtemp_Inst)) +
+  geom_point(aes(color=Flow_Inst_cd, shape=site_no))
+qtemp_scatter
 
 ## ----themes_examp_custom-------------------------------------------------
-scatter_ions_base <- scatter_ions + 
+qtemp_scatter_base <- qtemp_scatter + 
   theme(panel.background = element_blank(), 
         panel.grid = element_blank(),
         panel.border = element_rect(fill = NA),
-        text = element_text(family="serif", color="red", size=24))
-scatter_ions_base
+        text = element_text(family="serif", color="blue", size=15))
+qtemp_scatter_base
 
 ## ----themes_examp_stock--------------------------------------------------
-scatter_ions + theme_bw()
-scatter_ions + theme_classic()
+qtemp_scatter + theme_bw()
+qtemp_scatter + theme_classic()
 
 ## ----themes_examp_polished-----------------------------------------------
 #Now Let's start over, with some new colors and regression lines
-scatter_ions_polished <- ggplot(MenomineeMajorIons, aes(x=Magnesium, y=Potassium)) +
-  geom_point(aes(color=season, shape=season)) +
-  stat_smooth(method="lm", aes(color=season)) +
-  scale_color_manual(
-    breaks=c("summer", "winter"), 
-    values=c("steelblue1", "sienna")) + 
-  theme_classic(18, "serif") +
-  theme(text=element_text(color="slategray")) +
-  labs(title="Relationship between Potassium and Magnesium",
-       x="Magnesium Concentration", y="Potassium Concentration")
+qtemp_scatter_polished <- ggplot(data=intro_df, aes(x=Flow_Inst, y=Wtemp_Inst)) +
+  geom_point(aes(color=Flow_Inst_cd, shape=site_no)) +
+  stat_smooth(method="lm", aes(color=Flow_Inst_cd)) + 
+  theme_bw(15, "serif") +
+  theme(text=element_text(color="slategray"), panel.grid = element_blank()) +
+  labs(title="Relationship between Water temperature and Discharge",
+       x="Discharge, cfs", y="Water temp, deg C")
 
-scatter_ions_polished 
+qtemp_scatter_polished 
 
 ## ----ggsave_examp, eval=FALSE--------------------------------------------
 #  #Save as jpg, with 600dpi, and set width and height (see ?ggsave)
-#  ggsave(plot=scatter_ions_polished, file="Fig1.jpg", dpi=600, width=8, height=5)
+#  ggsave(plot=qtemp_scatter_polished, file="Fig1.jpg", dpi=600, width=8, height=5)
 #  #Save as PDF
-#  ggsave(plot=scatter_ions_polished, file="Fig1.pdf")
+#  ggsave(plot=qtemp_scatter_polished, file="Fig1.pdf")
 
 ## ----Exercise2, echo=FALSE-----------------------------------------------
 
 ## ----facet_grid_example--------------------------------------------------
-#Return to Magnesium vs Potassium scatter plot
-ions <- ggplot(MenomineeMajorIons, aes(x=Magnesium, y=Potassium)) +
+#Return to Water temp vs Flow scatter plot
+qtemp <- ggplot(data=intro_df, aes(x=Flow_Inst, y=Wtemp_Inst)) +
   geom_point() 
-ions
+qtemp
 
 # Faceting with one variable 
-# season = row faceting
+# site_no = row faceting
 # . = no column faceting
-ions + facet_grid(season ~ .)
+qtemp + facet_grid(site_no ~ .)
 
-# Faceting with two variables (remark codes of "<" indicate the sample was below the detection limit)
-#Nitrate.rmk = row faceting
-#Fluoride.rmk = column faceting
-ions + facet_grid(Nitrate.rmk ~ Fluoride.rmk)
+# Faceting with two variables
+#site_no = row faceting
+#Flow_Inst_cd = column faceting
+qtemp + facet_grid(site_no ~ Flow_Inst_cd)
 
 ## ----echo=FALSE----------------------------------------------------------
 gsIntroR::navigation_array(title)

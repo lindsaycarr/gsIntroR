@@ -29,17 +29,12 @@ myplot <- function(x, y, grp, file) {
   return(my_p)
 }
 
-#Call the function using a smwrData dataset
+#Call the function using intro_df
 
-#Load the data package!
-library(smwrData)
-
-data("MenomineeMajorIons")
-
-myplot(MenomineeMajorIons$Magnesium, MenomineeMajorIons$Potassium, 
-       MenomineeMajorIons$season, "Mg_K.jpg")
-myplot(MenomineeMajorIons$Calcium, MenomineeMajorIons$Sodium, 
-       MenomineeMajorIons$season, "Ca_Na.jpg")
+myplot(intro_df$Flow_Inst, intro_df$pH_Inst, 
+       intro_df$Flow_Inst_cd, "q_pH.jpg")
+myplot(intro_df$Flow_Inst, intro_df$DO_Inst, 
+       intro_df$Flow_Inst_cd, "q_do.jpg")
 
 ## ----for_examp-----------------------------------------------------------
 sum_vec <- function(vec) {

@@ -22,38 +22,32 @@ x[c(TRUE,FALSE)]
 x[x %% 2 == 0]
 
 ## ----data_frame_index----------------------------------------------------
-#Let's use one a data frame from the smwrData package
 
-#Load the package and data frame:
-library(smwrData)
-data("PugetNitrate")
-
-head(PugetNitrate)
-#And grab a specific value
-PugetNitrate[1,1]
-#A whole column
-nitrate_levels <- PugetNitrate[,7]
-nitrate_levels
-#A row
-obs15<-PugetNitrate[15,]
-obs15
-#Many rows
-obs3to7<-PugetNitrate[3:7,]
-obs3to7
+#Take a look at the data frame
+head(intro_df)
+#And grab the first site_no
+intro_df[1,1]
+#Get a whole column
+intro_df[,7]
+#Get a single row
+intro_df[15,]
+#Grab multiple rows
+intro_df[3:7,]
 
 ## ----more_data_frame_index-----------------------------------------------
 #First, there are a couple of ways to use the column names
-PugetNitrate$wellid
-head(PugetNitrate["wellid"])
+head(intro_df$site_no)
+head(intro_df["site_no"])
+head(intro_df[["site_no"]])
 #Multiple colums
-head(PugetNitrate[c("date","nitrate")])
+head(intro_df[c("dateTime","Flow_Inst")])
 #Now we can combine what we have seen to do some more complex queries
-#Get all the data where nitrate concentration is greater than 10
-high_nitrate <- PugetNitrate[PugetNitrate$nitrate > 10,]
-head(high_nitrate)
-#Or maybe we want just the nitrate concentrations for Bedrock geology
-bedrock_nitrate <- PugetNitrate$nitrate[PugetNitrate$surfgeo == "BedRock"]
-head(bedrock_nitrate)
+#Get all the data where water temperature is greater than 15
+high_temp <- intro_df[intro_df$Wtemp_Inst > 15,]
+head(high_temp)
+#Or maybe we want just the discharge that was estimated (code is "E")
+estimated_q <- intro_df$Flow_Inst[intro_df$Flow_Inst_cd == "E"]
+head(estimated_q)
 
 ## ----setup_dplyr,eval=FALSE----------------------------------------------
 #  install.packages("dplyr")
@@ -61,20 +55,19 @@ head(bedrock_nitrate)
 
 ## ----more_data_frame_dplyr-----------------------------------------------
 #First, select some columns
-dplyr_sel <- select(PugetNitrate, date, nitrate, surfgeo)
+dplyr_sel <- select(intro_df, site_no, dateTime, DO_Inst)
 head(dplyr_sel)
-#That's it.  Select one or many columns
 #Now select some observations, like before
-dplyr_high_nitrate <- filter(PugetNitrate, nitrate > 10)
-head(dplyr_high_nitrate)
-#Or maybe we want just the bedrock samples
-bedrock_nitrate <- filter(PugetNitrate, surfgeo == "BedRock")
-head(bedrock_nitrate)
+dplyr_high_temp <- filter(intro_df, Wtemp_Inst > 15)
+head(dplyr_high_temp)
+#Find just observations with estimated flows (as above)
+dplyr_estimated_q <- filter(intro_df, Flow_Inst_cd == "E")
+head(dplyr_estimated_q)
 
 ## ----mutate_example------------------------------------------------------
-#Add a column with well depth in kilometers instead of meters
-PugetNitrate_newcolumn <- mutate(PugetNitrate, wellkm = wellmet/1000)
-head(PugetNitrate_newcolumn)
+#Add a column with dissolved oxygen in mg/mL instead of mg/L
+intro_df_newcolumn <- mutate(intro_df, DO_mgmL = DO_Inst/1000)
+head(intro_df_newcolumn)
 
 ## ----if_else_examp-------------------------------------------------------
 x <- 2
@@ -120,101 +113,125 @@ if(num > 0) {
 }
 
 ## ----if_else_dplyr-------------------------------------------------------
-# if the column "wellkm" (well depth in kilometers) does not exist, we want to add it
-if(!'wellkm' %in% names(PugetNitrate)){
-  mutate(PugetNitrate, wellkm = wellmet/1000)
+# if the column "DO_mgmL" (dissolved oxygen in mg/mL) does not exist, we want to add it
+if(!'DO_mgmL' %in% names(intro_df)){
+  mutate(intro_df, DO_mgmL = DO_Inst/1000)
 } 
 
-# if there are more than 1000 observations, we want to filter out older observations
-if(nrow(PugetNitrate) > 1000){
-  filter(PugetNitrate, date >= as.Date("1990-01-01"))
+# if there are more than 1000 observations, we want to filter out high temperature observations
+if(nrow(intro_df) > 1000){
+  filter(intro_df, Wtemp_Inst >= 15)
 }
 
 ## ----ifelse_dplyr--------------------------------------------------------
 #use mutate along with ifelse to add a new column
-PugetNitrate_categorized <- mutate(PugetNitrate, nitrate_category = ifelse(nitrate > 1, "high", "low"))
+intro_df_revised <- mutate(intro_df, Flow_revised = ifelse(Flow_Inst_cd == "X", NA, Flow_Inst))
 
 ## ----combine_commands----------------------------------------------------
 #Intermediate data frames
-#Select First: note the order of the output, neat too!
-dplyr_bedrock_tmp1 <- select(PugetNitrate, surfgeo, date, nitrate)
-dplyr_bedrock_tmp <- filter(dplyr_bedrock_tmp1, surfgeo == "BedRock")
-head(dplyr_bedrock_tmp)
+dplyr_error_tmp1 <- select(intro_df, site_no, dateTime, Flow_Inst, Flow_Inst_cd)
+dplyr_error_tmp <- filter(dplyr_error_tmp1, Flow_Inst_cd == "X")
+head(dplyr_error_tmp)
 
 #Nested function
-dplyr_bedrock_nest <- filter(
-  select(PugetNitrate, surfgeo, date, nitrate),
-  surfgeo == "BedRock")
-head(dplyr_bedrock_nest)
+dplyr_error_nest <- filter(
+  select(intro_df, site_no, dateTime, Flow_Inst, Flow_Inst_cd),
+  Flow_Inst_cd == "X")
+head(dplyr_error_nest)
 
 #Pipes
-dplyr_bedrock_pipe <- PugetNitrate %>% 
-  select(surfgeo, date, nitrate) %>%
-  filter(surfgeo == "BedRock")
-head(dplyr_bedrock_pipe)
+dplyr_error_pipe <- intro_df %>% 
+  select(site_no, dateTime, Flow_Inst, Flow_Inst_cd) %>%
+  filter(Flow_Inst_cd == "X")
+head(dplyr_error_pipe)
 
 # Every function, including head(), can be chained
-PugetNitrate %>% 
-  select(surfgeo, date, nitrate) %>%
-  filter(surfgeo == "BedRock") %>% 
+intro_df %>% 
+  select(site_no, dateTime, Flow_Inst, Flow_Inst_cd) %>%
+  filter(Flow_Inst_cd == "X") %>% 
   head()
+
+## ----pH_wrong_intro_df---------------------------------------------------
+pH_df <- select(intro_df, pH_Inst)
+pH_numeric_df <- mutate(pH_df, pH_Inst_numeric = as.numeric(pH_Inst))
+filter(pH_numeric_df, is.na(pH_Inst_numeric), pH_Inst != "NA")
+
+## ----cleaning_up_intro_df------------------------------------------------
+intro_df <- mutate(intro_df, pH_Inst = as.numeric(pH_Inst))
+summary(intro_df)
 
 ## ----Exercise1, echo=FALSE-----------------------------------------------
 
 ## ----bind_rows_examp-----------------------------------------------------
 #Let's first create a new small example data.frame
-bind_rows_df1 <- data.frame(a=1:3, b=c("a","b","c"), c=c(T,T,F), d=rnorm(3))
-#Now an example df to add
-bind_rows_df2 <- data.frame(a=10:12, b=c("x","y","z"), c=c(F,F,F), d=rnorm(3))
-bind_rows_df <- bind_rows(bind_rows_df1, bind_rows_df2)
-bind_rows_df
+new_data <- data.frame(site_no=rep("00000001", 3), 
+                       dateTime=c("2016-09-01 07:45:00", "2016-09-02 07:45:00", "2016-09-03 07:45:00"), 
+                       Wtemp_Inst=c(14.0, 16.4, 16.0),
+                       pH_Inst = c(7.8, 8.5, 8.3),
+                       stringsAsFactors = FALSE)
+head(new_data)
+#Now add this to our existing df (intro_df)
+bind_rows_df <- bind_rows(intro_df, new_data)
+tail(bind_rows_df)
 
 ## ----merge_example-------------------------------------------------------
-# Contrived data frame
-bind_rows_df_merge_me <- data.frame(
-  a=c(1,3,10,11,14,6,23), x=rnorm(7), 
-  names=c("bob","joe","sue",NA,NA,"jeff",NA))
+# DO and discharge data
+forgotten_data <- data.frame(site_no=rep("00000001", 5),
+                             dateTime=c("2016-09-01 07:45:00", "2016-09-02 07:45:00", "2016-09-03 07:45:00",
+                                        "2016-09-04 07:45:00", "2016-09-05 07:45:00"),
+                             DO_Inst=c(10.2,8.7,9.3,9.2,8.9),
+                             Cl_conc=c(15.6,11.0,14.2,13.6,13.7),
+                             Flow_Inst=c(25,54,67,60,59),
+                             stringsAsFactors = FALSE)
 
-bind_rows_df_merge <- left_join(bind_rows_df, bind_rows_df_merge_me, by="a")
-bind_rows_df_merge
+left_join(new_data, forgotten_data, by=c("site_no", "dateTime"))
+
 
 ## ----Exercise2, echo=FALSE-----------------------------------------------
 
 ## ----group_by_examp------------------------------------------------------
-class(PugetNitrate)
+class(intro_df)
 
 # Group the data frame
-PugetNitrate_grouped <- group_by(PugetNitrate, surfgeo)
-class(PugetNitrate_grouped)
+intro_df_grouped <- group_by(intro_df, site_no)
+class(intro_df_grouped)
+
+## ----summarize_examp_NA--------------------------------------------------
+intro_df_summary <- summarize(intro_df_grouped, mean(Flow_Inst), mean(Wtemp_Inst))
+intro_df_summary
 
 ## ----summarize_examp-----------------------------------------------------
-PugetNitrate_summary <- summarize(PugetNitrate_grouped, mean(nitrate), mean(wellmet))
-PugetNitrate_summary
+intro_df_summary <- summarize(intro_df_grouped, mean(Flow_Inst, na.rm=TRUE), mean(Wtemp_Inst, na.rm=TRUE))
+intro_df_summary
 
 ## ----arrange_example-----------------------------------------------------
-data("TNLoads")
-head(TNLoads)
-
 #ascending order is default
-head(arrange(TNLoads, LOGTN))
+head(arrange(intro_df, DO_Inst))
 #descending
-head(arrange(TNLoads, desc(LOGTN)))
-#multiple columns: most nitrogen with lowest rainfall at top
-head(arrange(TNLoads, desc(LOGTN), MSRAIN))
+head(arrange(intro_df, desc(DO_Inst)))
+#multiple columns: lowest flow with highest temperature at top
+head(arrange(intro_df, Flow_Inst, desc(Wtemp_Inst)))
 
 ## ----slice_example-------------------------------------------------------
 #grab rows 3 through 10
-slice(TNLoads, 3:10)
+slice(intro_df, 3:10)
+
+## ----add_do_random-------------------------------------------------------
+intro_df_2DO <- mutate(intro_df, DO_2 = runif(n=nrow(intro_df), min = 5.0, max = 18.0))
+head(intro_df_2DO)
+
+## ----no_rowwise_examp----------------------------------------------------
+head(mutate(intro_df_2DO, max_DO = max(DO_Inst, DO_2)))
 
 ## ----rowwise_examp-------------------------------------------------------
-class(TNLoads)
+class(intro_df_2DO)
 
-TNLoads_byrow <- rowwise(TNLoads)
-class(TNLoads_byrow)
+intro_df_2DO_byrow <- rowwise(intro_df_2DO)
+class(intro_df_2DO_byrow)
 
 #Add a column that totals landuse for each observation
-landuse_sum <- mutate(TNLoads_byrow, landuse_total = sum(PRES, PNON, PCOMM, PIND))
-head(landuse_sum)
+intro_df_DO_max <- mutate(intro_df_2DO_byrow, max_DO = max(DO_Inst, DO_2))
+head(intro_df_DO_max)
 
 ## ----Exercise3, echo=FALSE-----------------------------------------------
 

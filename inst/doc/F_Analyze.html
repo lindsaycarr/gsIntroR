@@ -69,7 +69,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">F. Analyze with USGS packages</h1>
 <h4 class="author"><em>Jeffrey W. Hollister &amp; Emily Read</em></h4>
-<h4 class="date"><em>19 July, 2016</em></h4>
+<h4 class="date"><em>21 July, 2016</em></h4>
 
 
 <div id="TOC">
@@ -130,7 +130,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Merced River at Happy Isles Bridge, CA:</span>
 siteNumber &lt;-<span class="st"> &quot;11264500&quot;</span>
 Daily &lt;-<span class="st"> </span><span class="kw">readNWISDaily</span>(siteNumber, <span class="st">&quot;00060&quot;</span>, <span class="dt">startDate=</span><span class="st">&quot;&quot;</span>, <span class="dt">endDate=</span><span class="st">&quot;&quot;</span>)</code></pre></div>
-<pre><code>## There are 36856 data points, and 36856 days.</code></pre>
+<pre><code>## There are 36858 data points, and 36858 days.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">INFO &lt;-<span class="st"> </span><span class="kw">readNWISInfo</span>(siteNumber, <span class="st">&quot;&quot;</span>, <span class="dt">interactive=</span><span class="ot">FALSE</span>)
 INFO$shortName &lt;-<span class="st"> &quot;Merced River at Happy Isles Bridge, CA&quot;</span>
 eListMerced &lt;-<span class="st"> </span><span class="kw">as.egret</span>(INFO, Daily, <span class="ot">NA</span>, <span class="ot">NA</span>)
@@ -185,7 +185,7 @@ eList &lt;-<span class="st"> </span><span class="kw">mergeReport</span>(INFO, Da
 </div>
 <div id="learning-a-new-package" class="section level2">
 <h2>Learning a New Package</h2>
-<p>As of Jul 19, 2016, there were 8784 packages available on <a href="http://cran.r-project.org/web/packages/">CRAN</a>. Given this diversity and since these packages are created and maintained by many different authors, the ways in which you can get help on a specific package and the quality of that assistance can vary greatly. That being said, there are a few indicators of decent help for a given package.</p>
+<p>As of Jul 21, 2016, there were 8801 packages available on <a href="http://cran.r-project.org/web/packages/">CRAN</a>. Given this diversity and since these packages are created and maintained by many different authors, the ways in which you can get help on a specific package and the quality of that assistance can vary greatly. That being said, there are a few indicators of decent help for a given package.</p>
 <p>First, if a package has a vignette that is usually a good first place to start. To list the vignettes for a given package you can use the <code>vignette()</code> function. For instance:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">vignette</span>(<span class="dt">package=</span><span class="st">&quot;knitr&quot;</span>)</code></pre></div>
 <p>You can then open a specific vignette by name:</p>

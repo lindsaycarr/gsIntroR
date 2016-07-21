@@ -168,26 +168,25 @@ examp_list <- list(
 examp_list
 
 ## ----read_csv_examp------------------------------------------------------
-#Grab data from the web
-web_df <- read.csv("http://usgs-r.github.io/introR/figure/example.csv")
-head(web_df)
-str(web_df)
-dim(web_df)
-summary(web_df)
-
-## ----excel_to_csv_examp, eval=FALSE--------------------------------------
-#  first_sheet <- read.csv("example.csv")
-#  #Did it work?
-#  first_sheet
+# Read in the data and take a look at it
+intro_df <- read.csv("data/course_NWISdata.csv")
+head(intro_df)
+str(intro_df)
+dim(intro_df)
+summary(intro_df)
 
 ## ---- eval=FALSE---------------------------------------------------------
-#  str(read.csv("example.csv"))
-#  str(read.csv("example.csv", stringsAsFactors=FALSE))
+#  str(read.csv("data/course_NWISdata.csv"))
+#  str(read.csv("data/course_NWISdata.csv", stringsAsFactors=FALSE))
+
+## ------------------------------------------------------------------------
+intro_df <- read.csv("data/course_NWISdata.csv", stringsAsFactors = FALSE, colClasses = c("character", rep(NA, 6)))
+str(intro_df)
 
 ## ----write.csv examp, eval=FALSE-----------------------------------------
-#  write.table(web_df, file = "example_data_frame.csv", sep=",")
+#  write.table(intro_df, file = "example_data_frame.csv", sep=",")
 #  # or
-#  write.csv(web_df, file="example_data_frame.csv")
+#  write.csv(intro_df, file="example_data_frame.csv")
 
 ## ----dataRetrievalExample, eval=FALSE------------------------------------
 #  library(dataRetrieval)
@@ -199,10 +198,6 @@ summary(web_df)
 #  head(phosData)
 
 ## ----Exercise2, echo=FALSE-----------------------------------------------
-
-## ------------------------------------------------------------------------
-filepath <- system.file("IonBalance.csv", package = "gsIntroR")
-filepath_complete <- file.path(filepath, "IonBalance.csv")
 
 ## ----echo=FALSE----------------------------------------------------------
 gsIntroR::navigation_array(title)

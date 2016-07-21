@@ -10,65 +10,48 @@ pop_ttest <- t.test(pop1, pop2)
 pop_ttest
 
 ## ----ttest_formula_examp-------------------------------------------------
-#Load the data package!
-library(smwrData)
-
-#Let's choose a prefabricated dataset, MiningIron 
-data("MiningIron")
-bind_rows(head(MiningIron), tail(MiningIron))
-
-#Compare iron concentration between rock types
-#There are two rock types, these serve as your two different populations 
-#You cannot use this to compare more than two groups 
-#Try using MineType instead of Rock and see what R tells you
-t.test(MiningIron$Iron ~ MiningIron$Rock)
+#Filter so that there are only two Flow_Inst_cd groups
+#You might have to load dplyr
+library(dplyr)
+err_est_df <- filter(intro_df, Flow_Inst_cd %in% c("X", "E"))
+t.test(err_est_df$Flow_Inst ~ err_est_df$Flow_Inst_cd)
 
 ## ----corr_examp,message=FALSE,warning=FALSE------------------------------
-#Use the UraniumTDS data set from smwrData
-data("UraniumTDS")
-
 #A simple correlation
-cor(UraniumTDS$TDS, UraniumTDS$Uranium)
+cor(intro_df$Wtemp_Inst, intro_df$DO_Inst, use="complete.obs")
 #And a test of that correlation
-cor.test(UraniumTDS$TDS, UraniumTDS$Uranium)
+cor.test(intro_df$Wtemp_Inst, intro_df$DO_Inst)
 
 #A data frame as input to cor returns a correlation matrix
-#Can't just do cor(UraniumTDS) because UraniumTDS has non-numeric columns:
-# cor(UraniumTDS)
-library(dplyr) # use dplyr to select the numeric columns of UraniumTDS
-UraniumTDS_onlynumeric <- select(UraniumTDS, -HCO3)  
-cor(UraniumTDS_onlynumeric)
-
-#This is especially useful for data frames with many columns that could correlate
-#Create a correlation matrix for MiscGW (all columns are numeric)
-data("MiscGW")
-cor(MiscGW)
+#Can't just do cor(intro_df) because intro_df has non-numeric columns:
+# cor(intro_df)
+# use dplyr to select the numeric columns of intro_df
+intro_df_onlynumeric <- select(intro_df, -site_no, -dateTime, -Flow_Inst_cd)  
+cor(intro_df_onlynumeric, use="complete.obs")
 
 ## ----lm_examp------------------------------------------------------------
-data("MenomineeMajorIons") #from smwrData
-
-lm(Magnesium ~ HCO3, data=MenomineeMajorIons)
+lm(pH_Inst ~ Flow_Inst, data=intro_df)
 #Not much info, so save to object and use summary
-lm_gwq1 <- lm(Magnesium ~ HCO3, data=MenomineeMajorIons)
+lm_gwq1 <- lm(pH_Inst ~ Flow_Inst, data=intro_df)
 summary(lm_gwq1)
 #And now a multiple linear regression
-lm_gwq2 <- lm(Magnesium ~ HCO3 + Calcium + Sodium, data=MenomineeMajorIons)
+lm_gwq2 <- lm(pH_Inst ~ Flow_Inst + DO_Inst + Wtemp_Inst, data=intro_df)
 summary(lm_gwq2)
 
 ## ----abline_examp_lm-----------------------------------------------------
-plot(MenomineeMajorIons$HCO3, MenomineeMajorIons$Magnesium)
+plot(intro_df$Flow_Inst, intro_df$pH_Inst)
 #abline accepts a linear model object as input
 #linear model is done with lm, and uses a formula as input
-abline(lm(Magnesium ~ HCO3, data=MenomineeMajorIons))
+abline(lm(pH_Inst ~ Flow_Inst, data=intro_df))
 
 ## ----abline_examp--------------------------------------------------------
-plot(MenomineeMajorIons$Sulfate, MenomineeMajorIons$HCO3)
+plot(intro_df$Wtemp_Inst, intro_df$DO_Inst)
 #horizontal line at specified y value
-abline(h=140)
+abline(h=11)
 #a vertical line
 abline(v=15)
 #Line with a slope and intercept
-abline(55, 6)
+abline(7, 0.5)
 
 ## ----Exercise1, echo=FALSE-----------------------------------------------
 
