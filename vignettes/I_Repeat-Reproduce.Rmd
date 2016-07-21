@@ -21,6 +21,8 @@ gsIntroR::navigation_array(title)
 
 You now have a basic understanding of how to conduct a typical data analysis workflow in R.  All that is left is to be able to write it up in such a way that others can not only understand what we did, but repeat it exactly on their own machines. To do this effectively we need to understand how to create reusable R code and create reproducible reports.  This will be a very high level introduction to both concepts, but should hopefully give you a jumping off place for more learning.
 
+Remember to load the NWIS dataset we have been use. If it's no longer loaded, load in the cleaned up version using this filepath `inst/extdata/course_NWISdata_cleaned.csv`, and `read.csv` (remember that we named it `intro_df`, and don't forget `stringsAsFactors=FALSE`, and `colClasses`).
+
 ##Quick Links to Exercises and R code
 - [Exercise 1](#exercise-1): Writing functions and control structures
 - [Exercise 2](#exercise-2): Creating an RMarkdown document
@@ -79,17 +81,12 @@ myplot <- function(x, y, grp, file) {
   return(my_p)
 }
 
-#Call the function using a smwrData dataset
+#Call the function using intro_df
 
-#Load the data package!
-library(smwrData)
-
-data("MenomineeMajorIons")
-
-myplot(MenomineeMajorIons$Magnesium, MenomineeMajorIons$Potassium, 
-       MenomineeMajorIons$season, "Mg_K.jpg")
-myplot(MenomineeMajorIons$Calcium, MenomineeMajorIons$Sodium, 
-       MenomineeMajorIons$season, "Ca_Na.jpg")
+myplot(intro_df$Flow_Inst, intro_df$pH_Inst, 
+       intro_df$Flow_Inst_cd, "q_pH.jpg")
+myplot(intro_df$Flow_Inst, intro_df$DO_Inst, 
+       intro_df$Flow_Inst_cd, "q_do.jpg")
 ```
 
 Cool, a function, that does something useful.  It still is just a collection of functions at this point though.  What if we wanted to repeat something?  Well we need to look more at some of the classic programming structures in R.  For this introduction, I am going to look just at `for` loops (some in the R world think this to be bad since R is optimized for working on vectors, but the concept is useful),  and `return()`.  
@@ -360,8 +357,8 @@ In this document we can see a couple of things.  First at the top we see:
 
     ---
     title: "My First Reproducible Document"
-    author: "Jeff W. Hollister"
-    date: "1/6/2015"
+    author: "Author Name"
+    date: "1/1/2016"
     output: html_document
     ---
 
