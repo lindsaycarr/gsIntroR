@@ -43,12 +43,11 @@ createTrainingDF <- function(nwis_data, filename = "vignettes/data/course_NWISda
   
   write.csv(nwis_data_changed, filename, row.names=FALSE)
   
-  return(filename)
+  return(nwis_data_changed)
 }
 
-alterNWISdata <- function(nwis_data)
-
 # Functions to manipulate a data.frame
+
 insertRandomNAs <- function(orig_col, nrows = 3000, percentNA = 0.03){
   new_col <- orig_col
   nNAs <- round(nrows*percentNA)
@@ -69,6 +68,7 @@ createDFCleanSubset <- function(intro_df, filename = "vignettes/data/course_NWIS
   # data frame after subsetting section in Clean
   cleaned_df <- mutate(intro_df, pH_Inst = as.numeric(pH_Inst))
   write.csv(cleaned_df, filename, row.names=FALSE)
+  return(cleaned_df)
 }
 
 # Workflow to create training df
@@ -76,7 +76,7 @@ createDFCleanSubset <- function(intro_df, filename = "vignettes/data/course_NWIS
 library(dataRetrieval)
 library(dplyr)
 
-stateCd <- "WI"
+stateCd <- "GA"
 startDate <- "2011-05-01"
 endDate <- "2011-05-31"
 
