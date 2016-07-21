@@ -2,7 +2,15 @@
 title: "Example Schedule"
 author: "Lindsay R. Carr"
 date: "July 21, 2016"
-output: html_document
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    fig_width: 6
+    fig_height: 6
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{B. Get}
+  \usepackage[utf8]{inputenc}
 ---
 
 ## Day 1
