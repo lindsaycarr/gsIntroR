@@ -28,7 +28,7 @@ getNWISdf <- function(stateCd, startDate, endDate){
   return(nwis_data)
 }
 
-createTrainingDF <- function(nwis_data, filename = "inst/extdata/course_NWISdata.csv"){
+createTrainingDF <- function(nwis_data, filename = "vignettes/data/course_NWISdata.csv"){
   # Altering NWIS data for training example
   nwis_data_changed <- nwis_data %>% 
     sample_n(3000, replace=nrow(nwis_data) < 3000) %>% 
@@ -65,7 +65,7 @@ insertRandomValues <- function(orig_col, nrows = 3000, percentChange, values){
   return(new_col)
 }
 
-createDFCleanSubset <- function(intro_df, filename = "inst/extdata/course_NWISdata_cleaned.csv"){
+createDFCleanSubset <- function(intro_df, filename = "vignettes/data/course_NWISdata_cleaned.csv"){
   # data frame after subsetting section in Clean
   cleaned_df <- mutate(intro_df, pH_Inst = as.numeric(pH_Inst))
   write.csv(cleaned_df, filename, row.names=FALSE)
