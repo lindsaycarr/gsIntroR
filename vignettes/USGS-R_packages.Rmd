@@ -50,7 +50,7 @@ names(GRAN_pkg[,1:2])
 [geoknife](https://github.com/USGS-R/geoknife)
 
 * For web-based geoprocessing of gridded data, especially that available through the USGS Geo Data Portal
-* http://www.ecography.org/article/geoknife-reproducible-web-processing-large-gridded-datasets
+* http://onlinelibrary.wiley.com/doi/10.1111/ecog.01880/abstract
 * http://www.ecography.org/blog/slicing-gridded-data-geoknife 
 * http://usgs-r.github.io/geoknife/
 
@@ -84,7 +84,7 @@ names(GRAN_pkg[,1:2])
 [streamMetabolizer](https://github.com/USGS-R/streamMetabolizer)
 
 * Models for estimating stream/river production and respiration from dissolved oxygen data
-* see also LakeMetabolizer (CRAN/GLEON) for lakes
+* see also [LakeMetabolizer](https://github.com/GLEON/LakeMetabolizer) for lakes
 
 [sensorQC](https://github.com/USGS-R/sensorQC)
 
